@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import '../constants/api_constants.dart';
@@ -28,7 +29,9 @@ class StripeService {
         },
       );
 
-      final data = response.data;
+      final dynamic rawData = response.data;
+      final Map<String, dynamic> data = (rawData is String) ? jsonDecode(rawData) : rawData;
+
       if (data['error'] != null) {
         throw Exception(data['error']);
       }

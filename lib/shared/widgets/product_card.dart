@@ -31,14 +31,11 @@ class ProductCard extends ConsumerWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Hero(
-                  tag: heroTag ?? 'product_image_${product.id}',
-                  child: CachedImage(
-                    imageUrl: product.images.isNotEmpty
-                        ? product.images.first
-                        : '',
-                    fit: BoxFit.cover,
-                  ),
+                CachedImage(
+                  imageUrl: product.images.isNotEmpty
+                      ? product.images.first
+                      : '',
+                  fit: BoxFit.cover,
                 ),
 
                 // Badges overlay (top-left)
@@ -77,7 +74,7 @@ class ProductCard extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.4),
+                        color: const Color(0xFF202020).withValues(alpha: 0.4),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -99,7 +96,7 @@ class ProductCard extends ConsumerWidget {
                           horizontal: 16,
                           vertical: 8,
                         ),
-                        color: Colors.black,
+                        color: const Color(0xFF202020),
                         child: Text(
                           'SOLD OUT',
                           style: Theme.of(context)

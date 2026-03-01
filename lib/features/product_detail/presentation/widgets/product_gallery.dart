@@ -45,19 +45,10 @@ class _ProductGalleryState extends State<ProductGallery> {
             controller: _pageController,
             itemCount: widget.images.length,
             itemBuilder: (context, index) {
-              final isFirstImage = index == 0;
-              final imageWidget = CachedImage(
+              return CachedImage(
                 imageUrl: widget.images[index],
                 fit: BoxFit.cover,
               );
-
-              if (isFirstImage) {
-                return Hero(
-                  tag: 'product_image_${widget.productId}',
-                  child: imageWidget,
-                );
-              }
-              return imageWidget;
             },
           ),
 
@@ -71,8 +62,8 @@ class _ProductGalleryState extends State<ProductGallery> {
                   controller: _pageController,
                   count: widget.images.length,
                   effect: ExpandingDotsEffect(
-                    activeDotColor: Colors.black,
-                    dotColor: Colors.black.withValues(alpha: 0.3),
+                    activeDotColor: const Color(0xFF202020),
+                    dotColor: const Color(0xFF202020).withValues(alpha: 0.3),
                     dotHeight: 4,
                     dotWidth: 8,
                     spacing: 4,

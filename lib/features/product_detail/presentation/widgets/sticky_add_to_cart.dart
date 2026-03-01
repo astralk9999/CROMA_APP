@@ -29,7 +29,7 @@ class StickyAddToCart extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: const Color(0xFF202020).withValues(alpha: 0.05),
             offset: const Offset(0, -4),
             blurRadius: 10,
           ),
@@ -55,7 +55,7 @@ class StickyAddToCart extends StatelessWidget {
                 side: BorderSide(
                   color: (isOutOfStock || isUpcoming)
                       ? Colors.grey.shade300
-                      : Colors.black,
+                      : const Color(0xFF202020),
                   width: 2,
                 ),
               ),
@@ -65,7 +65,7 @@ class StickyAddToCart extends StatelessWidget {
                   fontWeight: FontWeight.w900,
                   color: (isOutOfStock || isUpcoming)
                       ? Colors.grey
-                      : Colors.black,
+                      : const Color(0xFF202020),
                 ),
               ),
             ),
@@ -106,9 +106,9 @@ class StickyAddToCart extends StatelessWidget {
   }
 
   Color _getButtonColor() {
-    if (isUpcoming) return Colors.black;
+    if (isUpcoming) return const Color(0xFF202020);
     if (isOutOfStock) return Colors.grey.shade300;
-    return Colors.black;
+    return const Color(0xFF202020);
   }
 
   VoidCallback? _getButtonAction() {

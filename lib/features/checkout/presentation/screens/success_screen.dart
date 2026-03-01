@@ -18,7 +18,7 @@ class SuccessScreen extends StatelessWidget {
               const Icon(
                 Icons.check_circle_outline,
                 size: 80,
-                color: Colors.black,
+                color: Color(0xFF202020),
               ),
               const SizedBox(height: 32),
               Text(

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/favorites/data/favorites_provider.dart';
 import '../../features/cart/providers/cart_provider.dart';
+import '../../core/providers/language_provider.dart';
 
 class CromaBottomNav extends ConsumerWidget {
   final int currentIndex;
@@ -18,6 +19,8 @@ class CromaBottomNav extends ConsumerWidget {
     final cartCount = cartState.whenOrNull(
       data: (items) => items.fold<int>(0, (sum, i) => sum + i.quantity),
     ) ?? 0;
+    
+    final isEs = ref.watch(languageProvider) == 'es';
 
     return Padding(
       // We keep it floating a bit above the screen bottom like a modern pill
@@ -43,11 +46,11 @@ class CromaBottomNav extends ConsumerWidget {
               left: 0, right: 0, bottom: 0, height: 70,
               child: Row(
                 children: [
-                  _buildNavItem(context, 0, Icons.home_rounded, Icons.home_outlined, 'Home', currentIndex),
-                  _buildNavItem(context, 1, Icons.search_rounded, Icons.search_outlined, 'Shop', currentIndex),
+                  _buildNavItem(context, 0, Icons.home_rounded, Icons.home_outlined, isEs ? 'Inicio' : 'Home', currentIndex),
+                  _buildNavItem(context, 1, Icons.search_rounded, Icons.search_outlined, isEs ? 'Tienda' : 'Shop', currentIndex),
                   const Expanded(child: SizedBox()), // Center gap for the floating button
-                  _buildNavItem(context, 3, Icons.favorite_rounded, Icons.favorite_outline_rounded, 'Favs', currentIndex, badge: favCount),
-                  _buildNavItem(context, 4, Icons.person_rounded, Icons.person_outline_rounded, 'Perfil', currentIndex),
+                  _buildNavItem(context, 3, Icons.favorite_rounded, Icons.favorite_outline_rounded, isEs ? 'Favs' : 'Favs', currentIndex, badge: favCount),
+                  _buildNavItem(context, 4, Icons.person_rounded, Icons.person_outline_rounded, isEs ? 'Perfil' : 'Profile', currentIndex),
                 ],
               ),
             ),
@@ -89,7 +92,7 @@ class CromaBottomNav extends ConsumerWidget {
 
   Widget _buildNavItem(BuildContext context, int index, IconData activeIcon, IconData inactiveIcon, String label, int currentIndex, {int badge = 0}) {
     final isSelected = currentIndex == index;
-    final color = isSelected ? Colors.black : Colors.black54; // Inactive icons are a softer grey
+    final color = isSelected ? const Color(0xFF202020) : Colors.black54; // Inactive icons are a softer grey
     final icon = isSelected ? activeIcon : inactiveIcon;
     
     return Expanded(
@@ -141,7 +144,7 @@ class CromaBottomNav extends ConsumerWidget {
       child: Text(
         count > 9 ? '9+' : '$count',
         style: TextStyle(
-          color: isDarkBg ? Colors.black : Colors.white,
+          color: isDarkBg ? const Color(0xFF202020) : Colors.white,
           fontSize: 9,
           fontWeight: FontWeight.w900,
         ),

@@ -21,6 +21,7 @@ ShippingAddress _$ShippingAddressFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$ShippingAddress {
+  String? get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
   String get phone => throw _privateConstructorUsedError;
@@ -48,6 +49,7 @@ abstract class $ShippingAddressCopyWith<$Res> {
   ) = _$ShippingAddressCopyWithImpl<$Res, ShippingAddress>;
   @useResult
   $Res call({
+    String? id,
     String name,
     String email,
     String phone,
@@ -73,6 +75,7 @@ class _$ShippingAddressCopyWithImpl<$Res, $Val extends ShippingAddress>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = freezed,
     Object? name = null,
     Object? email = null,
     Object? phone = null,
@@ -83,6 +86,10 @@ class _$ShippingAddressCopyWithImpl<$Res, $Val extends ShippingAddress>
   }) {
     return _then(
       _value.copyWith(
+            id: freezed == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String?,
             name: null == name
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
@@ -127,6 +134,7 @@ abstract class _$$ShippingAddressImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
+    String? id,
     String name,
     String email,
     String phone,
@@ -151,6 +159,7 @@ class __$$ShippingAddressImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = freezed,
     Object? name = null,
     Object? email = null,
     Object? phone = null,
@@ -161,6 +170,10 @@ class __$$ShippingAddressImplCopyWithImpl<$Res>
   }) {
     return _then(
       _$ShippingAddressImpl(
+        id: freezed == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String?,
         name: null == name
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
@@ -198,6 +211,7 @@ class __$$ShippingAddressImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ShippingAddressImpl implements _ShippingAddress {
   const _$ShippingAddressImpl({
+    this.id,
     required this.name,
     required this.email,
     required this.phone,
@@ -210,6 +224,8 @@ class _$ShippingAddressImpl implements _ShippingAddress {
   factory _$ShippingAddressImpl.fromJson(Map<String, dynamic> json) =>
       _$$ShippingAddressImplFromJson(json);
 
+  @override
+  final String? id;
   @override
   final String name;
   @override
@@ -228,7 +244,7 @@ class _$ShippingAddressImpl implements _ShippingAddress {
 
   @override
   String toString() {
-    return 'ShippingAddress(name: $name, email: $email, phone: $phone, address: $address, city: $city, postalCode: $postalCode, country: $country)';
+    return 'ShippingAddress(id: $id, name: $name, email: $email, phone: $phone, address: $address, city: $city, postalCode: $postalCode, country: $country)';
   }
 
   @override
@@ -236,6 +252,7 @@ class _$ShippingAddressImpl implements _ShippingAddress {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ShippingAddressImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.phone, phone) || other.phone == phone) &&
@@ -250,6 +267,7 @@ class _$ShippingAddressImpl implements _ShippingAddress {
   @override
   int get hashCode => Object.hash(
     runtimeType,
+    id,
     name,
     email,
     phone,
@@ -278,6 +296,7 @@ class _$ShippingAddressImpl implements _ShippingAddress {
 
 abstract class _ShippingAddress implements ShippingAddress {
   const factory _ShippingAddress({
+    final String? id,
     required final String name,
     required final String email,
     required final String phone,
@@ -290,6 +309,8 @@ abstract class _ShippingAddress implements ShippingAddress {
   factory _ShippingAddress.fromJson(Map<String, dynamic> json) =
       _$ShippingAddressImpl.fromJson;
 
+  @override
+  String? get id;
   @override
   String get name;
   @override

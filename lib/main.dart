@@ -4,13 +4,16 @@ import 'core/config/app_config.dart';
 import 'core/services/supabase_service.dart';
 import 'core/services/stripe_service.dart';
 import 'core/services/dio_client.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Cargar variables de entorno
+  // 1. Cargar variables de entorno e inicializar fecha
   await AppConfig.loadConfig();
+  await initializeDateFormatting('es_ES', null);
+  await initializeDateFormatting('en_US', null);
 
   // 2. Inicializar servicios core
   await SupabaseService.initialize();

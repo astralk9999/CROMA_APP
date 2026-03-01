@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../core/providers/language_provider.dart';
 import '../../../../shared/models/cart_item.dart';
+import '../../../../shared/models/product.dart';
 import '../../../../shared/widgets/croma_app_bar.dart';
 import '../../../../shared/widgets/scroll_fading_widget.dart';
+import '../../../../shared/widgets/croma_loading.dart';
 import '../../../shop/data/shop_repository.dart';
 import '../../../cart/providers/cart_provider.dart';
 import '../widgets/product_gallery.dart';
@@ -49,6 +52,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final productAsync = ref.watch(productDetailProvider(widget.slug));
+    final isEs = ref.watch(languageProvider) == 'es';
 
     return productAsync.when(
       data: (product) {
@@ -155,15 +159,20 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             const SizedBox(height: 32),
 
                             // Details (Colors, Fit, Etc)
-                            const Divider(color: Colors.black, thickness: 2),
+                            Divider(color: Color(0xFF202020), thickness: 2),
                             const SizedBox(height: 16),
-                            _buildDetailRow('Color', product.colors.join(', ')),
+                            _buildDetailRow(
+                              isEs ? 'Color' : 'Color',
+                              product.colors.isNotEmpty 
+                                ? product.colors.join(', ') 
+                                : (isEs ? 'N/A' : 'N/A'),
+                            ),
                             if (product.category != null) ...[
                               const SizedBox(height: 8),
-                              _buildDetailRow('Categoría', product.category!),
+                              _buildDetailRow(isEs ? 'Categoría' : 'Category', product.category!),
                             ],
                             const SizedBox(height: 16),
-                            const Divider(color: Colors.black, thickness: 2),
+                            Divider(color: Color(0xFF202020), thickness: 2),
 
                             const SizedBox(height: 32),
                           ],
@@ -180,8 +189,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 left: 0,
                 right: 0,
                 child: StickyAddToCart(
-                  price: (product.discountActive == true && product.discountPercent != null) ? (product.price * (1 - (product.discountPercent! / 100))) : (product.salePrice ?? product.price),
-                  hasDiscount: product.discountActive == true || (product.salePrice != null && product.salePrice! < product.price),
+                  price: product.finalPrice,
+                  hasDiscount: product.hasDiscount,
                   originalPrice: product.price,
                   selectedSize: _selectedSize,
                   isOutOfStock: (product.stockBySizes?.values.fold<int>(0, (sum, quantity) => sum + (quantity as int? ?? 0)) ?? 0) <= 0,
@@ -208,7 +217,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       id: const Uuid().v4(),
                       productId: product.id,
                       name: product.name,
-                      price: (product.discountActive == true && product.discountPercent != null) ? (product.price * (1 - (product.discountPercent! / 100))) : (product.salePrice ?? product.price),
+                      price: product.finalPrice,
                       image: product.images.isNotEmpty
                           ? product.images.first
                           : '',
@@ -225,7 +234,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         content: Text(
                           '${product.name} ($_selectedSize) añadido al carrito',
                         ),
-                        backgroundColor: Colors.black,
+                        backgroundColor: const Color(0xFF202020),
                         duration: const Duration(seconds: 2),
                         action: SnackBarAction(
                           label: 'VER CARRITO',
@@ -242,7 +251,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         );
       },
       loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator(color: Colors.black)),
+        body: Center(child: CromaLoading()),
       ),
       error: (err, stack) => Scaffold(
         appBar: const CromaAppBar(),

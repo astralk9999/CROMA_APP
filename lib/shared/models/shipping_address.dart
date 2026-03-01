@@ -6,6 +6,7 @@ part 'shipping_address.g.dart';
 @freezed
 class ShippingAddress with _$ShippingAddress {
   const factory ShippingAddress({
+    String? id,
     required String name,
     required String email,
     required String phone,

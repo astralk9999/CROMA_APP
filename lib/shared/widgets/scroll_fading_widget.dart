@@ -21,7 +21,6 @@ class _ScrollFadingWidgetState extends State<ScrollFadingWidget>
   late final AnimationController _controller;
   late final Animation<double> _opacity;
   late final Animation<Offset> _slide;
-  bool _isVisible = false;
 
   @override
   void initState() {
@@ -39,7 +38,6 @@ class _ScrollFadingWidgetState extends State<ScrollFadingWidget>
     // Auto-trigger on init for now. A real scroll-driven fade needs a visibility detector.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        setState(() => _isVisible = true);
         _controller.forward();
       }
     });

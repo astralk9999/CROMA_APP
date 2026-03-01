@@ -7,11 +7,18 @@ import '../../../../shared/widgets/product_card.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
 import '../../data/favorites_provider.dart';
 
-class FavoritesScreen extends ConsumerWidget {
+class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
+  String? _selectedCategory;
+
+  @override
+  Widget build(BuildContext context) {
     final favProductsAsync = ref.watch(favoriteProductsProvider);
 
     return Scaffold(
@@ -57,25 +64,106 @@ class FavoritesScreen extends ConsumerWidget {
             );
           }
 
-          return GridView.builder(
-            padding: const EdgeInsets.all(16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.55,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 24,
-            ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              return ProductCard(
-                product: products[index],
-                onTap: () => context.push('/product/${products[index].slug}'),
-              );
-            },
+          final categories = products
+              .map((p) => p.category?.toUpperCase())
+              .where((c) => c != null && c.isNotEmpty)
+              .cast<String>()
+              .toSet()
+              .toList();
+          categories.sort();
+
+          final filteredProducts = _selectedCategory == null
+              ? products
+              : products.where((p) => p.category?.toUpperCase() == _selectedCategory).toList();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ─── TUS FAVORITOS Header & Filter ───
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 24, 16, 12),
+                child: Text(
+                  'TUS FAVORITOS',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                    letterSpacing: 2,
+                  ),
+                ),
+              ),
+              if (categories.isNotEmpty)
+                SizedBox(
+                  height: 40,
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categories.length + 1,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      final isAll = index == 0;
+                      final cat = isAll ? 'TODOS' : categories[index - 1];
+                      final isSelected = isAll 
+                          ? _selectedCategory == null 
+                          : _selectedCategory == cat;
+
+                      return ChoiceChip(
+                        label: Text(cat),
+                        selected: isSelected,
+                        onSelected: (_) {
+                          setState(() {
+                            _selectedCategory = isAll ? null : cat;
+                          });
+                        },
+                        selectedColor: const Color(0xFF202020),
+                        labelStyle: TextStyle(
+                          color: isSelected ? Colors.white : const Color(0xFF202020),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                          letterSpacing: 1,
+                        ),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                          side: BorderSide(color: Color(0xFF202020), width: 1),
+                        ),
+                        backgroundColor: Colors.white,
+                      );
+                    },
+                  ),
+                ),
+              const SizedBox(height: 16),
+
+              // ─── Products Grid ───
+              if (filteredProducts.isEmpty)
+                const Expanded(
+                  child: Center(
+                    child: Text('No hay productos en esta categoría', style: TextStyle(color: Colors.grey)),
+                  ),
+                )
+              else
+                Expanded(
+                  child: GridView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.55,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 24,
+                    ),
+                    itemCount: filteredProducts.length,
+                    itemBuilder: (context, index) {
+                      return ProductCard(
+                        product: filteredProducts[index],
+                        onTap: () => context.push(
+                            '/product/${filteredProducts[index].slug}'),
+                      );
+                    },
+                  ),
+                ),
+            ],
           );
         },
         loading: () => GridView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             childAspectRatio: 0.55,

@@ -9,7 +9,6 @@ import '../../../../shared/widgets/cached_image.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
 import '../../../../shared/models/product.dart';
 import '../../data/home_repository.dart';
-import '../../../shop/data/shop_repository.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -34,7 +33,7 @@ class HomeScreen extends ConsumerWidget {
               child: Container(
                 height: 520,
                 width: double.infinity,
-                color: Colors.black,
+                color: const Color(0xFF202020),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
@@ -111,7 +110,7 @@ class HomeScreen extends ConsumerWidget {
                   Container(
                     width: 40,
                     height: 3,
-                    color: Colors.black,
+                    color: const Color(0xFF202020),
                   ),
                   const SizedBox(height: 24),
                   Text(
@@ -149,7 +148,7 @@ class HomeScreen extends ConsumerWidget {
             // ─── DROPS / 2026 ───
             // ═══════════════════════════════════════════
             Container(
-              color: Colors.black,
+              color: const Color(0xFF202020),
               padding: const EdgeInsets.symmetric(vertical: 48),
               child: Column(
                 children: [
@@ -336,8 +335,8 @@ class HomeScreen extends ConsumerWidget {
             // ─── FOOTER ───
             // ═══════════════════════════════════════════
             Container(
-              color: Colors.black,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              color: const Color(0xFF202020),
+              padding: const EdgeInsets.fromLTRB(24, 32, 24, 120),
               width: double.infinity,
               child: Column(
                 children: [
@@ -386,12 +385,12 @@ class HomeScreen extends ConsumerWidget {
           Container(
               width: 4,
               height: 28,
-              color: light ? Colors.white : Colors.black),
+              color: light ? Colors.white : const Color(0xFF202020)),
           const SizedBox(width: 12),
           Text(
             title,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: light ? Colors.white : Colors.black,
+                  color: light ? Colors.white : const Color(0xFF202020),
                   fontWeight: FontWeight.w900,
                   letterSpacing: 3,
                 ),
@@ -442,7 +441,7 @@ class HomeScreen extends ConsumerWidget {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withAlpha(200),
+                            const Color(0xFF202020).withAlpha(200),
                           ],
                         ),
                       ),
@@ -496,7 +495,7 @@ class HomeScreen extends ConsumerWidget {
                         child: const Text(
                           'LIMITED',
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Color(0xFF202020),
                             fontSize: 10,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 2,
@@ -581,7 +580,7 @@ class HomeScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
         children: [
-          Icon(icon, size: 32, color: Colors.black),
+          Icon(icon, size: 32, color: const Color(0xFF202020)),
           const SizedBox(height: 12),
           Text(
             title,

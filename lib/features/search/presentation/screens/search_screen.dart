@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/product_card.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
 import '../../../../shared/models/product.dart';
+import '../../../../shared/widgets/croma_loading.dart';
 import '../../data/search_repository.dart';
 import '../../../shop/data/shop_repository.dart';
 
@@ -140,7 +141,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     child: Container(
                       height: 48,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black, width: 2),
+                        border: Border.all(color: const Color(0xFF202020), width: 2),
                       ),
                       child: Row(
                         children: [
@@ -178,8 +179,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: _activeFilterCount > 0 ? Colors.black : Colors.white,
-                        border: Border.all(color: Colors.black, width: 2),
+                        color: _activeFilterCount > 0 ? const Color(0xFF202020) : Colors.white,
+                        border: Border.all(color: const Color(0xFF202020), width: 2),
                       ),
                       child: Stack(
                         alignment: Alignment.center,
@@ -187,7 +188,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           Icon(
                             Icons.tune,
                             size: 20,
-                            color: _activeFilterCount > 0 ? Colors.white : Colors.black,
+                            color: _activeFilterCount > 0 ? Colors.white : const Color(0xFF202020),
                           ),
                           if (_activeFilterCount > 0)
                             Positioned(
@@ -291,7 +292,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       padding: const EdgeInsets.only(right: 8),
       child: Chip(
         label: Text(label, style: const TextStyle(fontSize: 11, color: Colors.white)),
-        backgroundColor: Colors.black,
+        backgroundColor: const Color(0xFF202020),
         deleteIcon: const Icon(Icons.close, size: 14, color: Colors.white),
         onDeleted: onRemove,
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -384,7 +385,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               onPressed: () => Navigator.pop(ctx)),
                         ],
                       ),
-                      const Divider(color: Colors.black, thickness: 2),
+                      Divider(color: Color(0xFF202020), thickness: 2),
                       const SizedBox(height: 16),
 
                       // ── Category ──
@@ -410,7 +411,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 )),
                           ],
                         ),
-                        loading: () => const CircularProgressIndicator(),
+                        loading: () => const CromaLoading(),
                         error: (_, __) => const Text('Error'),
                       ),
 
@@ -439,7 +440,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 )),
                           ],
                         ),
-                        loading: () => const CircularProgressIndicator(),
+                        loading: () => const CromaLoading(),
                         error: (_, __) => const Text('Error'),
                       ),
 
@@ -468,7 +469,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                 )),
                           ],
                         ),
-                        loading: () => const CircularProgressIndicator(),
+                        loading: () => const CromaLoading(),
                         error: (_, __) => const Text('Error'),
                       ),
 
@@ -484,7 +485,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             _search();
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
+                            backgroundColor: const Color(0xFF202020),
                             foregroundColor: Colors.white,
                             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                           ),
@@ -509,13 +510,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? Colors.black : Colors.white,
-          border: Border.all(color: Colors.black, width: 1.5),
+          color: selected ? const Color(0xFF202020) : Colors.white,
+          border: Border.all(color: const Color(0xFF202020), width: 1.5),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? Colors.white : Colors.black,
+            color: selected ? Colors.white : const Color(0xFF202020),
             fontSize: 11,
             fontWeight: FontWeight.w700,
             letterSpacing: 1,

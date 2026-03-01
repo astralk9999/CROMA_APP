@@ -16,7 +16,7 @@ void main() {
       }
       if (changed) {
         file.writeAsStringSync(content);
-        print('Fixed ${file.path}');
+        // print('Fixed ${file.path}');
       }
     }
   }

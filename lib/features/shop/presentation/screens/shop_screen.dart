@@ -6,6 +6,8 @@ import '../../../../shared/widgets/croma_bottom_nav.dart';
 import '../../../../shared/widgets/product_card.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
 import '../../../../shared/models/product.dart';
+import '../../../../shared/models/category.dart';
+import '../../../../shared/widgets/croma_loading.dart';
 import '../../data/shop_repository.dart';
 import '../../../search/data/search_repository.dart';
 
@@ -22,11 +24,11 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
   String? _selectedColor;
   String? _selectedEspecial; // 'limited', 'discount', 'viral', 'bestseller'
   String _searchQuery = '';
+  bool _isSearchExpanded = false;
   double? _minPrice;
   double? _maxPrice;
   String _sortBy = 'created_at';
   bool _sortAsc = false;
-  String _sortLabel = 'Más recientes';
   final TextEditingController _searchController = TextEditingController();
   final List<Product> _products = [];
   bool _isLoading = false;
@@ -34,6 +36,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
   int _currentPage = 0;
   final _scrollController = ScrollController();
   bool _initialLoad = true;
+  bool _showGrid = false;
 
   @override
   void initState() {
@@ -115,7 +118,19 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     await _loadProducts();
   }
 
-  void _clearAllFilters() {
+  void _applyFilterAndShowGrid({String? especial, String? categoryId, String? brand, String? color}) {
+    setState(() {
+      if (especial != null) _selectedEspecial = especial == _selectedEspecial ? null : especial;
+      if (categoryId != null) _selectedCategoryId = categoryId == _selectedCategoryId ? null : categoryId;
+      if (brand != null) _selectedBrand = brand == _selectedBrand ? null : brand;
+      if (color != null) _selectedColor = color == _selectedColor ? null : color;
+      _showGrid = true;
+    });
+    _loadProducts(reset: true);
+  }
+
+  void _clearAllFilters({bool resetGrid = false}) {
+
     setState(() {
       _searchQuery = '';
       _searchController.clear();
@@ -125,8 +140,52 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       _selectedBrand = null;
       _selectedColor = null;
       _selectedEspecial = null;
+      _isSearchExpanded = false;
+      if (resetGrid) _showGrid = false;
     });
     _loadProducts(reset: true);
+  }
+
+  Color _getColorFromCode(String colorName) {
+    final lower = colorName.toLowerCase();
+    switch (lower) {
+      case 'beige':
+      case 'crema': return const Color(0xFFF5F5DC);
+      case 'white':
+      case 'blanco': return Colors.white;
+      case 'black':
+      case 'negro': return const Color(0xFF202020);
+      case 'blue-grey': return Colors.blueGrey;
+      case 'blue':
+      case 'azul': return const Color(0xFF0D47A1);
+      case 'dark blue':
+      case 'azul oscuro': return const Color(0xFF001F3F);
+      case 'brown':
+      case 'marrón': return Colors.brown;
+      case 'green':
+      case 'verde': return const Color(0xFF2E7D32);
+      case 'olive':
+      case 'oliva': return const Color(0xFF556B2F);
+      case 'grey':
+      case 'gris': return Colors.grey;
+      case 'charcoal':
+      case 'carbon': return const Color(0xFF36454F);
+      case 'orange':
+      case 'naranja': return Colors.orange;
+      case 'pink':
+      case 'rosa': return Colors.pink;
+      case 'purple':
+      case 'púrpura': return Colors.purple;
+      case 'red':
+      case 'rojo': return const Color(0xFFB71C1C);
+      case 'yellow':
+      case 'amarillo': return Colors.yellow;
+      case 'ultraviolet': return const Color(0xFF5F4B8B);
+      case 'carbon black': return const Color(0xFF1E1E1E);
+      case 'burgundy':
+      case 'granate': return const Color(0xFF800020);
+      default: return Colors.grey.shade300;
+    }
   }
 
   void _showFilterDrawer(
@@ -158,7 +217,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                       decoration: const BoxDecoration(
                         border: Border(
                           bottom:
-                              BorderSide(color: Colors.black, width: 2),
+                              BorderSide(color: Color(0xFF202020), width: 2),
                         ),
                       ),
                       child: Row(
@@ -214,13 +273,19 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                         padding: const EdgeInsets.all(24),
                         children: [
                           // ─── ORDENAR POR ───
-                          const Text(
-                            'ORDENAR POR',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 14,
-                              letterSpacing: 2,
-                            ),
+                          Row(
+                            children: const [
+                              Icon(Icons.sort, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'ORDENAR POR',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 14,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 12),
                           Wrap(
@@ -228,8 +293,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                             runSpacing: 8,
                             children: [
                               _buildSortChip('newest', 'Más recientes', setModalState),
-                              _buildSortChip('price_asc', 'Precio: menor a mayor', setModalState),
-                              _buildSortChip('price_desc', 'Precio: mayor a menor', setModalState),
+                              _buildSortChip('price_asc', 'Precio ↑', setModalState),
+                              _buildSortChip('price_desc', 'Precio ↓', setModalState),
                               _buildSortChip('name_asc', 'Nombre A-Z', setModalState),
                             ],
                           ),
@@ -241,6 +306,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           // ─── ESPECIALES ───
                           _buildFilterSection(
                             'ESPECIALES',
+                            Icons.star_outline,
                             [
                               _FilterOption('LANZAMIENTOS LIMITADOS', 'limited'),
                               _FilterOption('DESCUENTOS', 'discount'),
@@ -261,13 +327,19 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           const SizedBox(height: 24),
 
                           // ─── PRECIO ───
-                          const Text(
-                            'PRECIO',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 14,
-                              letterSpacing: 2,
-                            ),
+                          Row(
+                            children: const [
+                              Icon(Icons.euro, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'PRECIO',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 14,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 12),
                           RangeSlider(
@@ -275,7 +347,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                             min: 0,
                             max: 500,
                             divisions: 50,
-                            activeColor: Colors.black,
+                            activeColor: const Color(0xFF202020),
                             inactiveColor: Colors.black12,
                             labels: RangeLabels(
                                 '€${(_minPrice ?? 0).toInt()}', '€${(_maxPrice ?? 500).toInt()}'),
@@ -299,51 +371,20 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           const SizedBox(height: 24),
 
                           // ─── CATEGORÍAS ───
-                          const Text(
-                            'CATEGORÍAS',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 14,
-                              letterSpacing: 2,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
                           categoriesAsync.when(
-                            data: (cats) => Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: cats.map((cat) {
-                                final selected =
-                                    _selectedCategoryId == cat.id;
-                                return ChoiceChip(
-                                  label: Text(cat.name.toUpperCase()),
-                                  selected: selected,
-                                  onSelected: (_) {
-                                    setModalState(() {
-                                      _selectedCategoryId =
-                                          selected ? null : cat.id;
-                                    });
-                                  },
-                                  selectedColor: Colors.black,
-                                  labelStyle: TextStyle(
-                                    color: selected
-                                        ? Colors.white
-                                        : Colors.black,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12,
-                                    letterSpacing: 1,
-                                  ),
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.zero,
-                                    side: BorderSide(
-                                        color: Colors.black, width: 1),
-                                  ),
-                                  backgroundColor: Colors.white,
-                                );
-                              }).toList(),
+                            data: (cats) => _buildFilterSection(
+                              'CATEGORÍAS',
+                              Icons.menu,
+                              cats.map((c) => _FilterOption(c.name.toUpperCase(), c.id)).toList(),
+                              _selectedCategoryId,
+                              (value) {
+                                setModalState(() {
+                                  _selectedCategoryId =
+                                      _selectedCategoryId == value ? null : value;
+                                });
+                              },
                             ),
-                            loading: () => const CircularProgressIndicator(
-                                color: Colors.black),
+                            loading: () => const CromaLoading(),
                             error: (_, __) => const SizedBox.shrink(),
                           ),
 
@@ -352,50 +393,20 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           const SizedBox(height: 24),
 
                           // ─── MARCAS ───
-                          const Text(
-                            'MARCAS',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 14,
-                              letterSpacing: 2,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
                           brandsAsync.when(
-                            data: (brands) => Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: brands.map((brand) {
-                                final selected = _selectedBrand == brand;
-                                return ChoiceChip(
-                                  label: Text(brand.toUpperCase()),
-                                  selected: selected,
-                                  onSelected: (_) {
-                                    setModalState(() {
-                                      _selectedBrand =
-                                          selected ? null : brand;
-                                    });
-                                  },
-                                  selectedColor: Colors.black,
-                                  labelStyle: TextStyle(
-                                    color: selected
-                                        ? Colors.white
-                                        : Colors.black,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12,
-                                    letterSpacing: 1,
-                                  ),
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.zero,
-                                    side: BorderSide(
-                                        color: Colors.black, width: 1),
-                                  ),
-                                  backgroundColor: Colors.white,
-                                );
-                              }).toList(),
+                            data: (brands) => _buildFilterSection(
+                              'MARCAS',
+                              Icons.business,
+                              brands.map((b) => _FilterOption(b.toUpperCase(), b)).toList(),
+                              _selectedBrand,
+                              (value) {
+                                setModalState(() {
+                                  _selectedBrand =
+                                      _selectedBrand == value ? null : value;
+                                });
+                              },
                             ),
-                            loading: () => const CircularProgressIndicator(
-                                color: Colors.black),
+                            loading: () => const CromaLoading(),
                             error: (_, __) => const SizedBox.shrink(),
                           ),
 
@@ -404,50 +415,49 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           const SizedBox(height: 24),
 
                           // ─── CROMATOGRAFÍA (Colores) ───
-                          const Text(
-                            'CROMATOGRAFÍA',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 14,
-                              letterSpacing: 2,
-                            ),
+                          Row(
+                            children: const [
+                              Icon(Icons.palette_outlined, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'CROMATOGRAFÍA',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 14,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 12),
                           colorsAsync.when(
                             data: (colors) => Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
+                              spacing: 12,
+                              runSpacing: 12,
                               children: colors.map((color) {
                                 final selected = _selectedColor == color;
-                                return ChoiceChip(
-                                  label: Text(color.toUpperCase()),
-                                  selected: selected,
-                                  onSelected: (_) {
+                                return GestureDetector(
+                                  onTap: () {
                                     setModalState(() {
-                                      _selectedColor =
-                                          selected ? null : color;
+                                      _selectedColor = selected ? null : color;
                                     });
                                   },
-                                  selectedColor: Colors.black,
-                                  labelStyle: TextStyle(
-                                    color: selected
-                                        ? Colors.white
-                                        : Colors.black,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12,
-                                    letterSpacing: 1,
+                                  child: Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: _getColorFromCode(color),
+                                      border: Border.all(
+                                        color: selected ? const Color(0xFF202020) : Colors.black12,
+                                        width: selected ? 3 : 1,
+                                      ),
+                                    ),
                                   ),
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.zero,
-                                    side: BorderSide(
-                                        color: Colors.black, width: 1),
-                                  ),
-                                  backgroundColor: Colors.white,
                                 );
                               }).toList(),
                             ),
-                            loading: () => const CircularProgressIndicator(
-                                color: Colors.black),
+                            loading: () => const CromaLoading(),
                             error: (_, __) => const SizedBox.shrink(),
                           ),
                         ],
@@ -467,7 +477,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                       decoration: const BoxDecoration(
                         border: Border(
                           top: BorderSide(
-                              color: Colors.black, width: 2),
+                              color: Color(0xFF202020), width: 2),
                         ),
                       ),
                       child: ElevatedButton(
@@ -476,7 +486,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                           _loadProducts(reset: true);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
+                          backgroundColor: const Color(0xFF202020),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                               vertical: 16),
@@ -506,6 +516,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 
   Widget _buildFilterSection(
     String title,
+    IconData icon,
     List<_FilterOption> options,
     String? selected,
     ValueChanged<String> onSelect,
@@ -513,13 +524,19 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w900,
-            fontSize: 14,
-            letterSpacing: 2,
-          ),
+        Row(
+          children: [
+            Icon(icon, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 14,
+                letterSpacing: 2,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         ...options.map((opt) {
@@ -527,34 +544,33 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
           return InkWell(
             onTap: () => onSelect(opt.value),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Row(
                 children: [
                   Container(
-                    width: 18,
-                    height: 18,
+                    width: 12,
+                    height: 12,
                     decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.black,
-                        width: isSelected ? 2 : 1,
+                      shape: BoxShape.circle,
+                      color: isSelected ? const Color(0xFF202020) : Colors.black12,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      opt.label,
+                      style: TextStyle(
+                        fontWeight: isSelected ? FontWeight.w900 : FontWeight.w500,
+                        fontSize: 13,
+                        letterSpacing: 1,
+                        color: isSelected ? const Color(0xFF202020) : Colors.black87,
                       ),
-                      color: isSelected ? Colors.black : Colors.white,
-                    ),
-                    child: isSelected
-                        ? const Icon(Icons.check,
-                            size: 14, color: Colors.white)
-                        : null,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    opt.label,
-                    style: TextStyle(
-                      fontWeight:
-                          isSelected ? FontWeight.w900 : FontWeight.w500,
-                      fontSize: 13,
-                      letterSpacing: 1,
                     ),
                   ),
+                  if (isSelected) 
+                     const Icon(Icons.close, size: 16, color: Color(0xFF202020))
+                  else
+                     const Icon(Icons.chevron_right, size: 16, color: Colors.black26),
                 ],
               ),
             ),
@@ -581,36 +597,32 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
             case 'newest':
               _sortBy = 'created_at';
               _sortAsc = false;
-              _sortLabel = 'Más recientes';
               break;
             case 'price_asc':
               _sortBy = 'price';
               _sortAsc = true;
-              _sortLabel = 'Precio ↑';
               break;
             case 'price_desc':
               _sortBy = 'price';
               _sortAsc = false;
-              _sortLabel = 'Precio ↓';
               break;
             case 'name_asc':
               _sortBy = 'name';
               _sortAsc = true;
-              _sortLabel = 'Nombre A-Z';
               break;
           }
         });
       },
-      selectedColor: Colors.black,
+      selectedColor: const Color(0xFF202020),
       labelStyle: TextStyle(
-        color: isSelected ? Colors.white : Colors.black,
+        color: isSelected ? Colors.white : const Color(0xFF202020),
         fontWeight: FontWeight.w700,
         fontSize: 12,
         letterSpacing: 1,
       ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.zero,
-        side: BorderSide(color: Colors.black, width: 1),
+        side: BorderSide(color: Color(0xFF202020), width: 1),
       ),
       backgroundColor: Colors.white,
     );
@@ -628,265 +640,388 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ─── Search Bar ───
+          // ─── Global Shop Header ───
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Buscar prendas, marcas, colores...',
-                prefixIcon: const Icon(Icons.search, color: Colors.black),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, color: Colors.black),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                          _loadProducts(reset: true);
-                        },
-                      )
-                    : null,
-                border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.zero,
-                  borderSide: BorderSide(color: Colors.black, width: 2),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderRadius: BorderRadius.zero,
-                  borderSide: BorderSide(color: Colors.black, width: 2),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-              ),
-              onSubmitted: (value) {
-                setState(() => _searchQuery = value);
-                _loadProducts(reset: true);
-              },
-              onChanged: (value) {
-                setState(() {});
-              },
-            ),
-          ),
-
-          // ─── Header ───
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'SHOP',
-                  style:
-                      Theme.of(context).textTheme.headlineMedium?.copyWith(
+                Row(
+                  children: [
+                    if (_showGrid) ...[
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Color(0xFF202020)),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          setState(() {
+                            _showGrid = false;
+                            _clearAllFilters(resetGrid: true);
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 12),
+                    ],
+                    Text(
+                      'SHOP',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.w900,
                             letterSpacing: 3,
+                            fontSize: 24,
                           ),
+                    ),
+                  ],
                 ),
-                // Filter button 
-                InkWell(
-                  onTap: () => _showFilterDrawer(brandsAsync, colorsAsync),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black, width: 2),
-                      color: _activeFilterCount > 0 ? Colors.black : Colors.white,
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        _isSearchExpanded ? Icons.search_off_rounded : Icons.search_rounded,
+                        color: const Color(0xFF202020),
+                      ),
+                      onPressed: () => setState(() => _isSearchExpanded = !_isSearchExpanded),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.tune,
-                          size: 18,
-                          color: _activeFilterCount > 0 ? Colors.white : Colors.black,
+                    if (_showGrid) ...[
+                      const SizedBox(width: 8),
+                      // Filter button (moved here for cleaner UI)
+                      IconButton(
+                        icon: Badge(
+                          isLabelVisible: _activeFilterCount > 0,
+                          label: Text(_activeFilterCount.toString()),
+                          child: const Icon(Icons.tune, color: Color(0xFF202020)),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _activeFilterCount > 0
-                              ? 'FILTROS ($_activeFilterCount)'
-                              : 'FILTRAR Y ORDENAR',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1,
-                            color: _activeFilterCount > 0 ? Colors.white : Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                        onPressed: () => _showFilterDrawer(ref.read(availableBrandsProvider), ref.read(availableColorsProvider)),
+                      ),
+                    ],
+                  ],
                 ),
               ],
             ),
           ),
-
-          // ─── Active Filter Chips ───
-          if (_activeFilterCount > 0)
-            SizedBox(
-              height: 40,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  if (_selectedEspecial != null)
-                    _buildActiveChip(
-                      _getEspecialLabel(_selectedEspecial!),
-                      () => setState(() {
-                        _selectedEspecial = null;
-                        _loadProducts(reset: true);
-                      }),
+          // ─── Search Bar (Collapsible) ───
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            height: _isSearchExpanded ? 70 : 0,
+            curve: Curves.easeInOut,
+            child: ClipRect(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                child: TextField(
+                  controller: _searchController,
+                  autofocus: _isSearchExpanded,
+                  decoration: InputDecoration(
+                    hintText: 'Buscar prendas, marcas, colores...',
+                    hintStyle: const TextStyle(fontSize: 12),
+                    prefixIcon: const Icon(Icons.search, color: Color(0xFF202020), size: 18),
+                    suffixIcon: IconButton(
+                            icon: const Icon(Icons.close, color: Color(0xFF202020), size: 18),
+                            onPressed: () {
+                              setState(() => _isSearchExpanded = false);
+                              if (_searchQuery.isNotEmpty) {
+                                _searchController.clear();
+                                setState(() => _searchQuery = '');
+                                _loadProducts(reset: true);
+                              }
+                            },
+                          ),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.zero,
+                      borderSide: BorderSide(color: Color(0xFF202020), width: 2),
                     ),
-                  if (_selectedCategoryId != null)
-                    _buildActiveChip(
-                      'Categoría',
-                      () => setState(() {
-                        _selectedCategoryId = null;
-                        _loadProducts(reset: true);
-                      }),
+                    focusedBorder: const OutlineInputBorder(
+                      borderRadius: BorderRadius.zero,
+                      borderSide: BorderSide(color: Color(0xFF202020), width: 2),
                     ),
-                  if (_selectedBrand != null)
-                    _buildActiveChip(
-                      _selectedBrand!,
-                      () => setState(() {
-                        _selectedBrand = null;
-                        _loadProducts(reset: true);
-                      }),
-                    ),
-                  if (_selectedColor != null)
-                    _buildActiveChip(
-                      _selectedColor!,
-                      () => setState(() {
-                        _selectedColor = null;
-                        _loadProducts(reset: true);
-                      }),
-                    ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: _clearAllFilters,
-                    child: const Center(
-                      child: Text(
-                        'LIMPIAR TODO',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
-                ],
+                  onSubmitted: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                      if (value.isNotEmpty) _showGrid = true;
+                    });
+                    _loadProducts(reset: true);
+                  },
+                ),
               ),
             ),
-
-          // ─── Categories Quick Filter ───
-          categoriesAsync.when(
-            data: (categories) => SizedBox(
-              height: 48,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                scrollDirection: Axis.horizontal,
-                itemCount: categories.length + 1,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  if (index == 0) return _buildFilterChip('ALL', null);
-                  final category = categories[index - 1];
-                  return _buildFilterChip(
-                    category.name.toUpperCase(),
-                    category.id,
-                  );
-                },
-              ),
-            ),
-            loading: () => const SizedBox(
-              height: 48,
-              child: Center(
-                  child: CircularProgressIndicator(color: Colors.black)),
-            ),
-            error: (err, stack) => const SizedBox.shrink(),
           ),
 
-          const SizedBox(height: 12),
-
-          // ─── Products Grid (Infinite Scroll) ───
-          Expanded(
-            child: _initialLoad
-                ? _buildLoadingGrid()
-                : _products.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.inventory_2_outlined,
-                                size: 48, color: Colors.grey),
-                            const SizedBox(height: 16),
-                            Text(
-                              'NO SE ENCONTRARON PRODUCTOS',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall
-                                  ?.copyWith(fontSize: 14),
-                            ),
-                            if (_activeFilterCount > 0) ...[
-                              const SizedBox(height: 16),
-                              TextButton(
-                                onPressed: _clearAllFilters,
-                                child: const Text('LIMPIAR FILTROS'),
-                              ),
-                            ],
-                          ],
-                        ),
-                      )
-                    : GridView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 8.0),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.50,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 24,
-                        ),
-                        itemCount: _products.length +
-                            (_isLoading && _hasMore ? 2 : 0),
-                        itemBuilder: (context, index) {
-                          if (index >= _products.length) {
-                            return const ProductCardShimmer();
-                          }
-                          final product = _products[index];
-                          return ProductCard(
-                            product: product,
-                            onTap: () => context
-                                .push('/product/${product.slug}'),
-                          );
-                        },
-                      ),
-          ),
+          if (!_showGrid)
+            _buildIndexMenu(brandsAsync, colorsAsync, categoriesAsync)
+          else
+            ..._buildGridContent(brandsAsync, colorsAsync),
         ],
       ),
       bottomNavigationBar: const CromaBottomNav(currentIndex: 1),
     );
   }
 
-  Widget _buildFilterChip(String label, String? categoryId) {
-    final isSelected = _selectedCategoryId == categoryId;
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (selected) {
-        if (selected) {
-          setState(() => _selectedCategoryId = categoryId);
-          _loadProducts(reset: true);
-        }
-      },
-      selectedColor: Colors.black,
-      labelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: isSelected ? Colors.white : Colors.black,
-            fontWeight: FontWeight.w900,
+  List<Widget> _buildGridContent(
+    AsyncValue<List<String>> brandsAsync,
+    AsyncValue<List<String>> colorsAsync,
+  ) {
+    return [
+      // ─── Active Filter Chips ───
+      if (_activeFilterCount > 0)
+        SizedBox(
+          height: 40,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            children: [
+              if (_selectedEspecial != null)
+                _buildActiveChip(
+                  _getEspecialLabel(_selectedEspecial!),
+                  () => setState(() {
+                    _selectedEspecial = null;
+                    _loadProducts(reset: true);
+                  }),
+                ),
+              if (_selectedCategoryId != null)
+                _buildActiveChip(
+                  'Categoría',
+                  () => setState(() {
+                    _selectedCategoryId = null;
+                    _loadProducts(reset: true);
+                  }),
+                ),
+              if (_selectedBrand != null)
+                _buildActiveChip(
+                  _selectedBrand!,
+                  () => setState(() {
+                    _selectedBrand = null;
+                    _loadProducts(reset: true);
+                  }),
+                ),
+              if (_selectedColor != null)
+                _buildActiveChip(
+                  _selectedColor!,
+                  () => setState(() {
+                    _selectedColor = null;
+                    _loadProducts(reset: true);
+                  }),
+                ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => _clearAllFilters(resetGrid: false),
+                child: const Center(
+                  child: Text(
+                    'LIMPIAR TODO',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-        side: BorderSide(color: Colors.black, width: 2),
+        ),
+
+      const SizedBox(height: 8),
+
+      // ─── Products Grid (Infinite Scroll) ───
+      Expanded(
+        child: _initialLoad
+            ? _buildLoadingGrid()
+            : _products.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.inventory_2_outlined,
+                            size: 48, color: Colors.grey),
+                        const SizedBox(height: 16),
+                        Text(
+                          'NO SE ENCONTRARON PRODUCTOS',
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelSmall
+                              ?.copyWith(fontSize: 14),
+                        ),
+                        if (_activeFilterCount > 0) ...[
+                          const SizedBox(height: 16),
+                          TextButton(
+                            onPressed: () => _clearAllFilters(resetGrid: false),
+                            child: const Text('LIMPIAR FILTROS'),
+                          ),
+                        ],
+                      ],
+                    ),
+                  )
+                : GridView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 120.0),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.50,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 24,
+                    ),
+                    itemCount: _products.length +
+                        (_isLoading && _hasMore ? 2 : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= _products.length) {
+                        return const ProductCardShimmer();
+                      }
+                      final product = _products[index];
+                      return ProductCard(
+                        product: product,
+                        onTap: () => context
+                            .push('/product/${product.slug}'),
+                      );
+                    },
+                  ),
       ),
-      backgroundColor: Colors.white,
+    ];
+  }
+
+  Widget _buildIndexMenu(
+    AsyncValue<List<String>> brandsAsync,
+    AsyncValue<List<String>> colorsAsync,
+    AsyncValue<List<Category>> categoriesAsync,
+  ) {
+    return Expanded(
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        children: [
+          // SHOP ALL Button
+          InkWell(
+            onTap: () {
+              setState(() {
+                _clearAllFilters(resetGrid: false);
+                _showGrid = true;
+              });
+              _loadProducts(reset: true);
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+              decoration: BoxDecoration(
+                color: const Color(0xFF202020),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text('TODA NUESTRA ROPA', style: TextStyle(color: Colors.white54, fontSize: 10, letterSpacing: 1)),
+                      Text('SHOP ALL', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 2)),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white12),
+                    child: const Icon(Icons.arrow_forward, color: Colors.white, size: 16),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+          
+          // ESPECIALES
+          _buildFilterSection(
+            'ESPECIALES',
+            Icons.star_outline,
+            const [
+              _FilterOption('LANZAMIENTOS LIMITADOS', 'limited'),
+              _FilterOption('DESCUENTOS', 'discount'),
+              _FilterOption('TENDENCIA', 'viral'),
+              _FilterOption('MÁS VENDIDOS', 'bestseller'),
+            ],
+            _selectedEspecial,
+            (value) => _applyFilterAndShowGrid(especial: value),
+          ),
+
+          const SizedBox(height: 24),
+          const Divider(color: Colors.black12),
+          const SizedBox(height: 24),
+
+          // CATEGORÍAS
+          categoriesAsync.when(
+            data: (cats) => _buildFilterSection(
+              'CATEGORÍAS',
+              Icons.menu,
+              cats.map((c) => _FilterOption(c.name.toUpperCase(), c.id)).toList(),
+              _selectedCategoryId,
+              (value) => _applyFilterAndShowGrid(categoryId: value),
+            ),
+            loading: () => const CromaLoading(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+
+          const SizedBox(height: 24),
+          const Divider(color: Colors.black12),
+          const SizedBox(height: 24),
+
+          // MARCAS
+          brandsAsync.when(
+            data: (brands) => _buildFilterSection(
+              'MARCAS',
+              Icons.business,
+              brands.map((b) => _FilterOption(b.toUpperCase(), b)).toList(),
+              _selectedBrand,
+              (value) => _applyFilterAndShowGrid(brand: value),
+            ),
+            loading: () => const CromaLoading(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+
+          const SizedBox(height: 24),
+          const Divider(color: Colors.black12),
+          const SizedBox(height: 24),
+
+          // CROMATOGRAFÍA
+          Row(
+            children: const [
+              Icon(Icons.palette_outlined, size: 20),
+              SizedBox(width: 8),
+              Text(
+                'CROMATOGRAFÍA',
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  letterSpacing: 2,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          colorsAsync.when(
+            data: (colors) => Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: colors.map((color) {
+                final selected = _selectedColor == color;
+                return GestureDetector(
+                  onTap: () => _applyFilterAndShowGrid(color: color),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _getColorFromCode(color),
+                      border: Border.all(
+                        color: selected ? const Color(0xFF202020) : Colors.black12,
+                        width: selected ? 3 : 1,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            loading: () => const CromaLoading(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+          const SizedBox(height: 120), // Bottom padding for nav bar
+        ],
+      ),
     );
   }
 
@@ -906,7 +1041,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         deleteIcon:
             const Icon(Icons.close, size: 14, color: Colors.white70),
         onDeleted: onRemove,
-        backgroundColor: Colors.black,
+        backgroundColor: const Color(0xFF202020),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.zero,
         ),
@@ -932,7 +1067,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 
   Widget _buildLoadingGrid() {
     return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 120.0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 0.50,

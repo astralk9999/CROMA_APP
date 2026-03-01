@@ -31,8 +31,8 @@ class CachedImage extends StatelessWidget {
 
     final optimizedUrl = CloudinaryService.getOptimizedUrl(
       imageUrl,
-      width: width?.toInt(),
-      height: height?.toInt(),
+      width: (width != null && width!.isFinite) ? width!.toInt() : null,
+      height: (height != null && height!.isFinite) ? height!.toInt() : null,
     );
 
     return CachedNetworkImage(
@@ -45,7 +45,7 @@ class CachedImage extends StatelessWidget {
         height: height,
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: const Center(
-          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
+          child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF202020)),
         ),
       ),
       errorWidget: (context, url, error) => Container(

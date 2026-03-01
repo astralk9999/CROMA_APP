@@ -85,12 +85,12 @@ class ContactScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 2),
+          border: Border.all(color: const Color(0xFF202020), width: 2),
           color: Colors.white,
         ),
         child: Column(
           children: [
-            Icon(icon, size: 40, color: Colors.black),
+            Icon(icon, size: 40, color: const Color(0xFF202020)),
             const SizedBox(height: 16),
             Text(
               title,

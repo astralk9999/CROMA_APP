@@ -93,7 +93,7 @@ class AboutScreen extends StatelessWidget {
           ).textTheme.headlineMedium?.copyWith(letterSpacing: 2.0),
         ),
         const SizedBox(height: 8),
-        Container(width: 40, height: 2, color: Colors.black),
+        Container(width: 40, height: 2, color: const Color(0xFF202020)),
         const SizedBox(height: 16),
         Text(
           description,

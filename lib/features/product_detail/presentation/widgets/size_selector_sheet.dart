@@ -63,12 +63,12 @@ class SizeSelectorSheet extends StatelessWidget {
                       4, // 4 items per row
                   height: 60,
                   decoration: BoxDecoration(
-                    color: isSelected ? Colors.black : Colors.white,
+                    color: isSelected ? const Color(0xFF202020) : Colors.white,
                     border: Border.all(
                       color: isOutOfStock
                           ? Colors.grey.shade300
                           : isSelected
-                          ? Colors.black
+                          ? const Color(0xFF202020)
                           : Colors.grey.shade400,
                       width: 2,
                     ),
@@ -84,7 +84,7 @@ class SizeSelectorSheet extends StatelessWidget {
                               ? Colors.grey.shade400
                               : isSelected
                               ? Colors.white
-                              : Colors.black,
+                              : const Color(0xFF202020),
                         ),
                       ),
                       if (isOutOfStock)

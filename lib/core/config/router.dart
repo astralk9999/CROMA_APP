@@ -12,6 +12,14 @@ import '../../features/checkout/presentation/screens/success_screen.dart';
 import '../../features/about/presentation/screens/about_screen.dart';
 import '../../features/contact/presentation/screens/contact_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/profile/presentation/screens/orders_screen.dart';
+import '../../features/profile/presentation/screens/order_details_screen.dart';
+import '../../features/profile/presentation/screens/returns_screen.dart';
+import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
+import '../../features/admin/presentation/screens/admin_products_screen.dart';
+import '../../features/admin/presentation/screens/admin_orders_screen.dart';
+import '../../features/admin/presentation/screens/admin_users_screen.dart';
+import '../../features/auth/presentation/screens/auth_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -67,6 +75,43 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfileScreen(),
+    ),
+    GoRoute(
+      path: '/orders',
+      builder: (context, state) => const OrdersScreen(),
+    ),
+    GoRoute(
+      path: '/orders/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return OrderDetailsScreen(orderId: id);
+      },
+    ),
+    GoRoute(
+      path: '/returns',
+      builder: (context, state) => const ReturnsScreen(),
+    ),
+    GoRoute(
+      path: '/admin',
+      builder: (context, state) => const AdminDashboardScreen(),
+      routes: [
+        GoRoute(
+          path: 'products',
+          builder: (context, state) => const AdminProductsScreen(),
+        ),
+        GoRoute(
+          path: 'orders',
+          builder: (context, state) => const AdminOrdersScreen(),
+        ),
+        GoRoute(
+          path: 'users',
+          builder: (context, state) => const AdminUsersScreen(),
+        ),
+      ],
+    ),
+    GoRoute(
+      path: '/auth',
+      builder: (context, state) => const AuthScreen(),
     ),
   ],
 );

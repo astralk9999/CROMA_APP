@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/supabase_service.dart';
+import '../../../../core/providers/language_provider.dart';
 import '../../../../shared/widgets/croma_bottom_nav.dart';
+import '../../data/profile_provider.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -34,6 +36,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = ref.watch(languageProvider);
+    final isEs = lang == 'es';
+
     return Scaffold(
       extendBody: true,
       backgroundColor: Colors.white,
@@ -43,91 +48,120 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ─── HEADER ───
-              Container(
-                color: Colors.black,
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.person, size: 36, color: Colors.white),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    if (_isLoggedIn) ...[
-                      Text(
-                        _name.isNotEmpty ? _name : _email,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
+                Container(
+                  color: const Color(0xFF202020),
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
                         ),
-                      ),
-                      if (_name.isNotEmpty)
-                        Text(
-                          _email,
-                          style: const TextStyle(color: Colors.white60, fontSize: 13),
-                        ),
-                    ] else ...[
-                      const Text(
-                        'INVITADO',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2,
+                        child: const Center(
+                          child: Icon(Icons.person, size: 36, color: Colors.white),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      OutlinedButton(
-                        onPressed: _showLoginDialog,
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.white, width: 2),
-                          foregroundColor: Colors.white,
-                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                      if (_isLoggedIn) ...[
+                        Text(
+                          _name.isNotEmpty ? _name : _email,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                        child: const Text('INICIAR SESIÓN'),
-                      ),
+                        if (_name.isNotEmpty)
+                          Text(
+                            _email,
+                            style: const TextStyle(color: Colors.white60, fontSize: 13),
+                          ),
+                        const SizedBox(height: 16),
+                        
+                        // Admin Panel Button
+                        ref.watch(userProfileProvider).when(
+                          data: (profile) => profile?.role == 'admin' 
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: TextButton.icon(
+                                  onPressed: () => context.push('/admin'),
+                                  icon: const Icon(Icons.admin_panel_settings_outlined, color: Colors.amber, size: 18),
+                                  label: const Text('PANEL DE ADMINISTRACIÓN', style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1)),
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Colors.white.withValues(alpha: 0.1),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                          loading: () => const SizedBox.shrink(),
+                          error: (_, __) => const SizedBox.shrink(),
+                        ),
+                      ] else ...[
+                        Text(
+                          isEs ? 'INVITADO' : 'GUEST',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        OutlinedButton(
+                          onPressed: () => context.push('/auth').then((_) => _loadUserData()),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.white, width: 2),
+                            foregroundColor: Colors.white,
+                            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                          ),
+                          child: Text(isEs ? 'INICIAR SESIÓN' : 'SIGN IN'),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
 
               const SizedBox(height: 8),
 
               // ─── SETTINGS SECTIONS ───
               _buildSection(
-                title: 'MI CUENTA',
+                title: isEs ? 'MI CUENTA' : 'MY ACCOUNT',
                 children: [
-                  if (_isLoggedIn)
-                    _buildTile(Icons.local_shipping_outlined, 'Dirección de envío por defecto', () {
-                      _showAddressDialog();
+                  if (_isLoggedIn) ...[
+                    _buildTile(Icons.shopping_bag_outlined, isEs ? 'Mis pedidos' : 'My orders', () {
+                      context.push('/orders');
                     }),
-                  if (_isLoggedIn)
-                    _buildTile(Icons.lock_outline, 'Cambiar contraseña', () {
-                      _showChangePasswordDialog();
+                    _buildTile(Icons.assignment_return_outlined, isEs ? 'Mis devoluciones' : 'My returns', () {
+                      context.push('/returns');
                     }),
-                  _buildTile(Icons.language, 'Idioma', () {
-                    _showLanguageDialog();
-                  }),
+                    _buildTile(Icons.local_shipping_outlined, isEs ? 'Dirección de envío' : 'Shipping address', () {
+                      _showAddressDialog(isEs);
+                    }),
+                  ],
+                  if (_isLoggedIn)
+                    _buildTile(Icons.lock_outline, isEs ? 'Cambiar contraseña' : 'Change password', () {
+                      _showChangePasswordDialog(isEs);
+                    }),
+                  _buildTile(Icons.language, isEs ? 'Idioma' : 'Language', () {
+                    _showLanguageDialog(isEs);
+                  }, isLast: true),
                 ],
               ),
 
               _buildSection(
-                title: 'INFORMACIÓN',
+                title: isEs ? 'INFORMACIÓN' : 'INFORMATION',
                 children: [
-                  _buildTile(Icons.info_outline, 'Sobre nosotros', () {
+                  _buildTile(Icons.info_outline, isEs ? 'Sobre nosotros' : 'About us', () {
                     context.push('/about');
                   }),
-                  _buildTile(Icons.mail_outline, 'Contacto', () {
+                  _buildTile(Icons.mail_outline, isEs ? 'Contacto' : 'Contact', () {
                     context.push('/contact');
-                  }),
+                  }, isLast: true),
                 ],
               ),
 
@@ -142,14 +176,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text(
-                      'CERRAR SESIÓN',
-                      style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
+                    child: Text(
+                      isEs ? 'CERRAR SESIÓN' : 'SIGN OUT',
+                      style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2),
                     ),
                   ),
                 ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 120),
             ],
           ),
         ),
@@ -163,83 +197,60 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
           child: Text(
             title,
             style: const TextStyle(
               fontWeight: FontWeight.w900,
-              fontSize: 12,
+              fontSize: 13,
               letterSpacing: 2,
-              color: Colors.grey,
+              color: Colors.black54,
             ),
           ),
         ),
-        ...children,
-        const Divider(height: 1),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.black12, width: 1),
+            borderRadius: BorderRadius.zero,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF202020).withValues(alpha: 0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: children,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildTile(IconData icon, String title, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.black, size: 22),
-      title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-      trailing: const Icon(Icons.chevron_right, size: 20),
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+  Widget _buildTile(IconData icon, String title, VoidCallback onTap, {bool isLast = false}) {
+    return Column(
+      children: [
+        ListTile(
+          leading: Icon(icon, color: const Color(0xFF202020), size: 22),
+          title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+          trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.black38),
+          onTap: onTap,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        ),
+        if (!isLast)
+          const Divider(height: 1, indent: 56, endIndent: 20, color: Colors.black12),
+      ],
     );
   }
 
   // ─── DIALOGS ───
 
-  void _showLoginDialog() {
-    final emailCtrl = TextEditingController();
-    final passCtrl = TextEditingController();
 
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        title: const Text('INICIAR SESIÓN', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: emailCtrl, decoration: const InputDecoration(labelText: 'Email')),
-            const SizedBox(height: 8),
-            TextField(controller: passCtrl, decoration: const InputDecoration(labelText: 'Contraseña'), obscureText: true),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCELAR')),
-          ElevatedButton(
-            onPressed: () async {
-              try {
-                await SupabaseService.client.auth.signInWithPassword(
-                  email: emailCtrl.text.trim(),
-                  password: passCtrl.text,
-                );
-                if (ctx.mounted) Navigator.pop(ctx);
-                _loadUserData();
-              } catch (e) {
-                if (ctx.mounted) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-                  );
-                }
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-            ),
-            child: const Text('ENTRAR', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAddressDialog() {
+  void _showAddressDialog(bool isEs) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -263,11 +274,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             onPressed: () {
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Dirección guardada'), backgroundColor: Colors.black),
+                SnackBar(content: Text('Dirección guardada'), backgroundColor: Color(0xFF202020)),
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
+              backgroundColor: const Color(0xFF202020),
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
             child: const Text('GUARDAR', style: TextStyle(color: Colors.white)),
@@ -277,7 +288,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  void _showChangePasswordDialog() {
+  void _showChangePasswordDialog(bool isEs) {
     final passCtrl = TextEditingController();
     showDialog(
       context: context,
@@ -300,7 +311,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 if (ctx.mounted) Navigator.pop(ctx);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Contraseña actualizada'), backgroundColor: Colors.black),
+                    SnackBar(content: Text('Contraseña actualizada'), backgroundColor: Color(0xFF202020)),
                   );
                 }
               } catch (e) {
@@ -312,7 +323,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
+              backgroundColor: const Color(0xFF202020),
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
             child: const Text('GUARDAR', style: TextStyle(color: Colors.white)),
@@ -322,29 +333,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  void _showLanguageDialog() {
+  void _showLanguageDialog(bool isEs) {
     showDialog(
       context: context,
       builder: (ctx) => SimpleDialog(
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        title: const Text('IDIOMA', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
+        title: Text(isEs ? 'IDIOMA' : 'LANGUAGE', style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
         children: [
           SimpleDialogOption(
             child: const Text('🇪🇸  Español'),
             onPressed: () {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Idioma: Español'), backgroundColor: Colors.black),
-              );
+              ref.read(languageProvider.notifier).setLanguage('es');
             },
           ),
           SimpleDialogOption(
             child: const Text('🇬🇧  English'),
             onPressed: () {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Language: English'), backgroundColor: Colors.black),
-              );
+              ref.read(languageProvider.notifier).setLanguage('en');
             },
           ),
         ],

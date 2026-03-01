@@ -7,8 +7,14 @@ import '../../features/favorites/data/favorites_provider.dart';
 class ProductCard extends ConsumerWidget {
   final Product product;
   final VoidCallback onTap;
+  final String? heroTag;
 
-  const ProductCard({super.key, required this.product, required this.onTap});
+  const ProductCard({
+    super.key, 
+    required this.product, 
+    required this.onTap,
+    this.heroTag,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,7 +32,7 @@ class ProductCard extends ConsumerWidget {
               fit: StackFit.expand,
               children: [
                 Hero(
-                  tag: 'product_image_${product.id}',
+                  tag: heroTag ?? 'product_image_${product.id}',
                   child: CachedImage(
                     imageUrl: product.images.isNotEmpty
                         ? product.images.first

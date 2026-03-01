@@ -20,7 +20,7 @@ class HomeScreen extends ConsumerWidget {
     final limitedDropsAsync = ref.watch(limitedDropsProvider);
     final viralTrendsAsync = ref.watch(viralTrendsProvider);
     final discountsAsync = ref.watch(discountedProductsProvider);
-    final discountsAsync = ref.watch(discountedProductsProvider);
+
     return Scaffold(
       appBar: const CromaAppBar(),
       body: SingleChildScrollView(
@@ -603,6 +603,7 @@ class HomeScreen extends ConsumerWidget {
             width: 180,
             child: ProductCard(
               product: products[index],
+              heroTag: 'carousel_${products[index].id}',
               onTap: () =>
                   context.push('/product/${products[index].slug}'),
             ),
@@ -634,6 +635,7 @@ class HomeScreen extends ConsumerWidget {
         itemBuilder: (context, index) {
           return ProductCard(
             product: products[index],
+            heroTag: 'grid_${products[index].id}',
             onTap: () =>
                 context.push('/product/${products[index].slug}'),
           );

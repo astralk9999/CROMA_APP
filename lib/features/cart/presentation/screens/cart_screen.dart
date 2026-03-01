@@ -14,6 +14,7 @@ class CartScreen extends ConsumerWidget {
     final cartState = ref.watch(cartNotifierProvider);
 
     return Scaffold(
+      extendBody: true,
       appBar: const CromaAppBar(),
       body: cartState.when(
         data: (items) {

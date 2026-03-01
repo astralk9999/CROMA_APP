@@ -22,6 +22,7 @@ class HomeScreen extends ConsumerWidget {
     final discountsAsync = ref.watch(discountedProductsProvider);
 
     return Scaffold(
+      extendBody: true,
       appBar: const CromaAppBar(),
       body: SingleChildScrollView(
         child: Column(
@@ -280,78 +281,7 @@ class HomeScreen extends ConsumerWidget {
             // ─── NEWSLETTER ───
             // ═══════════════════════════════════════════
             const SizedBox(height: 56),
-            Container(
-              width: double.infinity,
-              color: Colors.black,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 56),
-              child: Column(
-                children: [
-                  Image.asset(
-                    'assets/images/logo_c_horns.png',
-                    height: 40,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'ÚNETE A LA RESISTENCIA',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 3,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Consigue acceso exclusivo a los próximos drops y un 10% de descuento',
-                    style: TextStyle(
-                      color: Colors.white60,
-                      fontSize: 13,
-                      height: 1.5,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 28),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 48,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          decoration: const BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(color: Colors.white38, width: 1),
-                            ),
-                          ),
-                          alignment: Alignment.centerLeft,
-                          child: const Text(
-                            'tu@email.com',
-                            style: TextStyle(color: Colors.white38, fontSize: 14),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        height: 48,
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        color: Colors.white,
-                        alignment: Alignment.center,
-                        child: const Text(
-                          'UNIRSE',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 2,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+
 
             // ═══════════════════════════════════════════
             // ─── VALUE PROPS ───

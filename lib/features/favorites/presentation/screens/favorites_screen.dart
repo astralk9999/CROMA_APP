@@ -15,6 +15,7 @@ class FavoritesScreen extends ConsumerWidget {
     final favProductsAsync = ref.watch(favoriteProductsProvider);
 
     return Scaffold(
+      extendBody: true,
       appBar: const CromaAppBar(),
       body: favProductsAsync.when(
         data: (products) {

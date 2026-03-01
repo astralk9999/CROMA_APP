@@ -129,10 +129,11 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     _loadProducts(reset: true);
   }
 
-  void _showFilterDrawer() {
+  void _showFilterDrawer(
+    AsyncValue<List<String>> brandsAsync,
+    AsyncValue<List<String>> colorsAsync,
+  ) {
     final categoriesAsync = ref.read(categoriesProvider);
-    final brandsAsync = ref.read(availableBrandsProvider);
-    final colorsAsync = ref.read(availableColorsProvider);
 
     showModalBottomSheet(
       context: context,
@@ -212,6 +213,31 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                         controller: scrollController,
                         padding: const EdgeInsets.all(24),
                         children: [
+                          // ─── ORDENAR POR ───
+                          const Text(
+                            'ORDENAR POR',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 14,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              _buildSortChip('newest', 'Más recientes', setModalState),
+                              _buildSortChip('price_asc', 'Precio: menor a mayor', setModalState),
+                              _buildSortChip('price_desc', 'Precio: mayor a menor', setModalState),
+                              _buildSortChip('name_asc', 'Nombre A-Z', setModalState),
+                            ],
+                          ),
+
+                          const SizedBox(height: 24),
+                          const Divider(color: Colors.black12),
+                          const SizedBox(height: 24),
+
                           // ─── ESPECIALES ───
                           _buildFilterSection(
                             'ESPECIALES',
@@ -538,11 +564,66 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     );
   }
 
+  Widget _buildSortChip(String value, String label, StateSetter setModalState) {
+    // Determine if this is the currently active sort configuration
+    bool isSelected = false;
+    if (value == 'newest' && _sortBy == 'created_at' && !_sortAsc) isSelected = true;
+    if (value == 'price_asc' && _sortBy == 'price' && _sortAsc) isSelected = true;
+    if (value == 'price_desc' && _sortBy == 'price' && !_sortAsc) isSelected = true;
+    if (value == 'name_asc' && _sortBy == 'name' && _sortAsc) isSelected = true;
+
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) {
+        setModalState(() {
+          switch (value) {
+            case 'newest':
+              _sortBy = 'created_at';
+              _sortAsc = false;
+              _sortLabel = 'Más recientes';
+              break;
+            case 'price_asc':
+              _sortBy = 'price';
+              _sortAsc = true;
+              _sortLabel = 'Precio ↑';
+              break;
+            case 'price_desc':
+              _sortBy = 'price';
+              _sortAsc = false;
+              _sortLabel = 'Precio ↓';
+              break;
+            case 'name_asc':
+              _sortBy = 'name';
+              _sortAsc = true;
+              _sortLabel = 'Nombre A-Z';
+              break;
+          }
+        });
+      },
+      selectedColor: Colors.black,
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.white : Colors.black,
+        fontWeight: FontWeight.w700,
+        fontSize: 12,
+        letterSpacing: 1,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero,
+        side: BorderSide(color: Colors.black, width: 1),
+      ),
+      backgroundColor: Colors.white,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final categoriesAsync = ref.watch(categoriesProvider);
+    final brandsAsync = ref.watch(availableBrandsProvider);
+    final colorsAsync = ref.watch(availableColorsProvider);
 
     return Scaffold(
+      extendBody: true,
       appBar: const CromaAppBar(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -599,100 +680,38 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                             letterSpacing: 3,
                           ),
                 ),
-                Row(
-                  children: [
-                    // Filter button with badge
-                    Stack(
-                      clipBehavior: Clip.none,
+                // Filter button 
+                InkWell(
+                  onTap: () => _showFilterDrawer(brandsAsync, colorsAsync),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black, width: 2),
+                      color: _activeFilterCount > 0 ? Colors.black : Colors.white,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
-                          onPressed: _showFilterDrawer,
-                          icon: const Icon(Icons.tune, size: 22),
+                        Icon(
+                          Icons.tune,
+                          size: 18,
+                          color: _activeFilterCount > 0 ? Colors.white : Colors.black,
                         ),
-                        if (_activeFilterCount > 0)
-                          Positioned(
-                            right: 4,
-                            top: 4,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: Colors.black,
-                                shape: BoxShape.circle,
-                              ),
-                              constraints: const BoxConstraints(
-                                  minWidth: 18, minHeight: 18),
-                              child: Text(
-                                '$_activeFilterCount',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _activeFilterCount > 0
+                              ? 'FILTROS ($_activeFilterCount)'
+                              : 'FILTRAR Y ORDENAR',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1,
+                            color: _activeFilterCount > 0 ? Colors.white : Colors.black,
                           ),
+                        ),
                       ],
                     ),
-                    // Sort dropdown
-                    PopupMenuButton<String>(
-                      icon: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.sort, size: 18),
-                          const SizedBox(width: 4),
-                          Text(
-                            _sortLabel,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero),
-                      itemBuilder: (_) => [
-                        const PopupMenuItem(
-                            value: 'newest', child: Text('Más recientes')),
-                        const PopupMenuItem(
-                            value: 'price_asc',
-                            child: Text('Precio: menor a mayor')),
-                        const PopupMenuItem(
-                            value: 'price_desc',
-                            child: Text('Precio: mayor a menor')),
-                        const PopupMenuItem(
-                            value: 'name_asc', child: Text('Nombre A-Z')),
-                      ],
-                      onSelected: (value) {
-                        setState(() {
-                          switch (value) {
-                            case 'newest':
-                              _sortBy = 'created_at';
-                              _sortAsc = false;
-                              _sortLabel = 'Más recientes';
-                              break;
-                            case 'price_asc':
-                              _sortBy = 'price';
-                              _sortAsc = true;
-                              _sortLabel = 'Precio ↑';
-                              break;
-                            case 'price_desc':
-                              _sortBy = 'price';
-                              _sortAsc = false;
-                              _sortLabel = 'Precio ↓';
-                              break;
-                            case 'name_asc':
-                              _sortBy = 'name';
-                              _sortAsc = true;
-                              _sortLabel = 'A-Z';
-                              break;
-                          }
-                        });
-                        _loadProducts(reset: true);
-                      },
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),

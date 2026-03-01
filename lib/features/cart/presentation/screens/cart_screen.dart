@@ -225,7 +225,7 @@ class CartScreen extends ConsumerWidget {
             const Center(child: CircularProgressIndicator(color: Colors.black)),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
-      bottomNavigationBar: const CromaBottomNav(currentIndex: 2),
+      bottomNavigationBar: const CromaBottomNav(currentIndex: 3),
     );
   }
 }

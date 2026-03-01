@@ -6,7 +6,7 @@ part of 'auth_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authSafeHash() => r'908c73462de63761a3cb6c0ea3cfbf29ad639448';
+String _$authSafeHash() => r'ac53e99aadb859d49c5b15bcb89472a1fbe81538';
 
 /// See also [authSafe].
 @ProviderFor(authSafe)
@@ -23,7 +23,7 @@ final authSafeProvider = AutoDisposeStreamProvider<User?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AuthSafeRef = AutoDisposeStreamProviderRef<User?>;
-String _$currentUserHash() => r'c0249db8a642b8548e6afdc1dbc2f0b9427a70bc';
+String _$currentUserHash() => r'0e5023e8173a2cc6ca5020dfb7919371151474c9';
 
 /// See also [currentUser].
 @ProviderFor(currentUser)
@@ -40,7 +40,7 @@ final currentUserProvider = AutoDisposeProvider<User?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentUserRef = AutoDisposeProviderRef<User?>;
-String _$isAuthenticatedHash() => r'b72ba2077fffcbed5f0a4b6a5d3cbf052855b804';
+String _$isAuthenticatedHash() => r'54fa2e7165f29e09a4d03d1f0bf7ae0df72cf5dc';
 
 /// See also [isAuthenticated].
 @ProviderFor(isAuthenticated)

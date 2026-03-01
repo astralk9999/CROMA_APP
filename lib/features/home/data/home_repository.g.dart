@@ -74,5 +74,41 @@ final limitedDropsProvider = AutoDisposeFutureProvider<List<Product>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef LimitedDropsRef = AutoDisposeFutureProviderRef<List<Product>>;
+String _$discountedProductsHash() =>
+    r'84e8572fc6fa85ef171378a88fc73ce4823e8e35';
+
+/// See also [discountedProducts].
+@ProviderFor(discountedProducts)
+final discountedProductsProvider =
+    AutoDisposeFutureProvider<List<Product>>.internal(
+      discountedProducts,
+      name: r'discountedProductsProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$discountedProductsHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef DiscountedProductsRef = AutoDisposeFutureProviderRef<List<Product>>;
+String _$comingSoonHash() => r'1fa8ce1b31d5fcd66aea792d540ba571a5993837';
+
+/// See also [comingSoon].
+@ProviderFor(comingSoon)
+final comingSoonProvider = AutoDisposeFutureProvider<List<Product>>.internal(
+  comingSoon,
+  name: r'comingSoonProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$comingSoonHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ComingSoonRef = AutoDisposeFutureProviderRef<List<Product>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

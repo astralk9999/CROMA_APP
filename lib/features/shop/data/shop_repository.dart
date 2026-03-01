@@ -11,9 +11,13 @@ class ShopRepository {
   Future<List<Product>> getProducts({
     String? categoryId,
     bool? featured,
+    String sortBy = 'created_at',
+    bool sortAsc = false,
+    int page = 0,
+    int pageSize = 20,
   }) async {
     Map<String, Object> filters = {'is_hidden': false};
-    
+
     if (categoryId != null && categoryId.isNotEmpty) {
       filters['category_id'] = categoryId;
     }
@@ -21,7 +25,15 @@ class ShopRepository {
       filters['featured'] = featured;
     }
 
-    final data = await _client.from('products').select().match(filters).order('created_at', ascending: false);
+    final from = page * pageSize;
+    final to = from + pageSize - 1;
+
+    final data = await _client
+        .from('products')
+        .select()
+        .match(filters)
+        .order(sortBy, ascending: sortAsc)
+        .range(from, to);
     return (data as List).map((e) => Product.fromJson(e)).toList();
   }
 

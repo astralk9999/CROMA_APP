@@ -9,11 +9,10 @@ class CromaAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(
-        'CROMA',
-        style: Theme.of(
-          context,
-        ).textTheme.displaySmall?.copyWith(color: Colors.white),
+      title: Image.asset(
+        'assets/images/chromakopia_logo.png',
+        height: 28,
+        color: Colors.white,
       ),
       centerTitle: true,
       actions: [
@@ -21,8 +20,8 @@ class CromaAppBar extends StatelessWidget implements PreferredSizeWidget {
           IconButton(
             icon: const Icon(Icons.shopping_cart_outlined),
             onPressed: () {
-            context.push('/cart');
-          },
+              context.push('/cart');
+            },
           ),
       ],
     );

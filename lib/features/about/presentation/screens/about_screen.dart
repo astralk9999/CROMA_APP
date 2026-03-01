@@ -76,7 +76,7 @@ class AboutScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const CromaBottomNav(currentIndex: 3),
+      // No bottom nav — accessed from Profile
     );
   }
 

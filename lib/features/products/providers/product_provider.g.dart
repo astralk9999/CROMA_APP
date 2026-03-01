@@ -6,7 +6,7 @@ part of 'product_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$featuredProductsHash() => r'161507884744835c58cfc63d558910235b982d0e';
+String _$featuredProductsHash() => r'db13f6bbfa5155c2bb136492ed8dac894ff0c6e3';
 
 /// See also [featuredProducts].
 @ProviderFor(featuredProducts)
@@ -25,7 +25,7 @@ final featuredProductsProvider =
 // ignore: unused_element
 typedef FeaturedProductsRef = AutoDisposeFutureProviderRef<List<Product>>;
 String _$productsByCategoryHash() =>
-    r'a32fd1b5a8dbb7d0fb1810419f0b6915c978d424';
+    r'a120e15fa6701cf879931a53f54c6d42d2284d31';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -169,7 +169,7 @@ class _ProductsByCategoryProviderElement
       (origin as ProductsByCategoryProvider).categorySlug;
 }
 
-String _$productBySlugHash() => r'9d6f785541b3e3aad25f0bedb463a1577df9f3ba';
+String _$productBySlugHash() => r'161c9617c09063b01b75d9f92764d044b6724275';
 
 /// See also [productBySlug].
 @ProviderFor(productBySlug)
@@ -289,7 +289,7 @@ class _ProductBySlugProviderElement
   String get slug => (origin as ProductBySlugProvider).slug;
 }
 
-String _$allProductsHash() => r'afdaf6022c987ed348747df1710aa7caff9692f1';
+String _$allProductsHash() => r'c8a7696e7ff3d2fa139dd813fb6a70f93e205a8c';
 
 /// See also [allProducts].
 @ProviderFor(allProducts)
@@ -306,7 +306,7 @@ final allProductsProvider = AutoDisposeFutureProvider<List<Product>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AllProductsRef = AutoDisposeFutureProviderRef<List<Product>>;
-String _$searchProductsHash() => r'efb81ed8eba098776809f3ccfcafc34374698d3c';
+String _$searchProductsHash() => r'98cc933d06a05ce0c9d682b0bb8070ac2023173d';
 
 /// See also [searchProducts].
 @ProviderFor(searchProducts)

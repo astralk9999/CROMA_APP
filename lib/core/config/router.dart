@@ -3,12 +3,14 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/shop/presentation/screens/shop_screen.dart';
+import '../../features/search/presentation/screens/search_screen.dart';
 import '../../features/product_detail/presentation/screens/product_detail_screen.dart';
 import '../../features/cart/presentation/screens/cart_screen.dart';
 import '../../features/checkout/presentation/screens/checkout_screen.dart';
 import '../../features/checkout/presentation/screens/success_screen.dart';
 import '../../features/about/presentation/screens/about_screen.dart';
 import '../../features/contact/presentation/screens/contact_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -25,6 +27,10 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/shop',
       builder: (context, state) => const ShopScreen(),
+    ),
+    GoRoute(
+      path: '/search',
+      builder: (context, state) => const SearchScreen(),
     ),
     GoRoute(
       path: '/product/:slug',
@@ -52,6 +58,10 @@ final goRouter = GoRouter(
     GoRoute(
       path: '/contact',
       builder: (context, state) => const ContactScreen(),
+    ),
+    GoRoute(
+      path: '/profile',
+      builder: (context, state) => const ProfileScreen(),
     ),
   ],
 );

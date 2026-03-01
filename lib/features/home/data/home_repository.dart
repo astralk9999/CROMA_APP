@@ -14,7 +14,7 @@ class HomeRepository {
         .eq('is_hidden', false)
         .eq('is_bestseller', true)
         .order('created_at', ascending: false)
-        .limit(6);
+        .limit(8);
     return (data as List).map((e) => Product.fromJson(e)).toList();
   }
 
@@ -25,7 +25,7 @@ class HomeRepository {
         .eq('is_hidden', false)
         .eq('is_viral_trend', true)
         .order('created_at', ascending: false)
-        .limit(6);
+        .limit(8);
     return (data as List).map((e) => Product.fromJson(e)).toList();
   }
 
@@ -37,6 +37,28 @@ class HomeRepository {
         .eq('is_limited_drop', true)
         .order('created_at', ascending: false)
         .limit(6);
+    return (data as List).map((e) => Product.fromJson(e)).toList();
+  }
+
+  Future<List<Product>> getDiscountedProducts() async {
+    final data = await _client
+        .from('products')
+        .select()
+        .eq('is_hidden', false)
+        .eq('discount_active', true)
+        .order('created_at', ascending: false)
+        .limit(4);
+    return (data as List).map((e) => Product.fromJson(e)).toList();
+  }
+
+  Future<List<Product>> getComingSoon() async {
+    final data = await _client
+        .from('products')
+        .select()
+        .eq('is_hidden', false)
+        .gt('available_from', DateTime.now().toIso8601String())
+        .order('available_from', ascending: true)
+        .limit(4);
     return (data as List).map((e) => Product.fromJson(e)).toList();
   }
 }
@@ -59,4 +81,14 @@ Future<List<Product>> viralTrends(ViralTrendsRef ref) {
 @riverpod
 Future<List<Product>> limitedDrops(LimitedDropsRef ref) {
   return ref.read(homeRepositoryProvider).getLimitedDrops();
+}
+
+@riverpod
+Future<List<Product>> discountedProducts(DiscountedProductsRef ref) {
+  return ref.read(homeRepositoryProvider).getDiscountedProducts();
+}
+
+@riverpod
+Future<List<Product>> comingSoon(ComingSoonRef ref) {
+  return ref.read(homeRepositoryProvider).getComingSoon();
 }

@@ -10,31 +10,58 @@ class ShopRepository {
 
   Future<List<Product>> getProducts({
     String? categoryId,
+    String? brand,
+    String? color,
+    bool? isLimitedDrop,
+    bool? hasDiscount,
+    bool? isViralTrend,
+    bool? isBestseller,
     bool? featured,
     String sortBy = 'created_at',
     bool sortAsc = false,
     int page = 0,
     int pageSize = 20,
   }) async {
-    Map<String, Object> filters = {'is_hidden': false};
+    var request = _client.from('products').select().eq('is_hidden', false);
 
     if (categoryId != null && categoryId.isNotEmpty) {
-      filters['category_id'] = categoryId;
+      request = request.eq('category_id', categoryId);
     }
     if (featured != null) {
-      filters['featured'] = featured;
+      request = request.eq('featured', featured);
+    }
+    if (brand != null && brand.isNotEmpty) {
+      request = request.ilike('brand', '%$brand%');
+    }
+    if (isLimitedDrop == true) {
+      request = request.eq('is_limited_drop', true);
+    }
+    if (hasDiscount == true) {
+      request = request.eq('discount_active', true);
+    }
+    if (isViralTrend == true) {
+      request = request.eq('is_viral_trend', true);
+    }
+    if (isBestseller == true) {
+      request = request.eq('is_bestseller', true);
     }
 
     final from = page * pageSize;
     final to = from + pageSize - 1;
 
-    final data = await _client
-        .from('products')
-        .select()
-        .match(filters)
+    final data = await request
         .order(sortBy, ascending: sortAsc)
         .range(from, to);
-    return (data as List).map((e) => Product.fromJson(e)).toList();
+
+    List<Product> products = (data as List).map((e) => Product.fromJson(e)).toList();
+
+    // Client-side color filter (colors is an array column)
+    if (color != null && color.isNotEmpty) {
+      products = products.where((p) =>
+          p.colors.any((c) => c.toLowerCase().contains(color.toLowerCase()))).toList();
+    }
+
+    return products;
   }
 
   Future<Product> getProductBySlug(String slug) async {

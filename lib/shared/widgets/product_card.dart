@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/product.dart';
 import 'cached_image.dart';
+import '../../features/favorites/data/favorites_provider.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends ConsumerWidget {
   final Product product;
   final VoidCallback onTap;
 
   const ProductCard({super.key, required this.product, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favIds = ref.watch(favoritesProvider);
+    final isFav = favIds.contains(product.id);
+
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -30,7 +35,7 @@ class ProductCard extends StatelessWidget {
                   ),
                 ),
 
-                // Badges overlay
+                // Badges overlay (top-left)
                 Positioned(
                   top: 8,
                   left: 8,
@@ -55,6 +60,29 @@ class ProductCard extends StatelessWidget {
                   ),
                 ),
 
+                // Favorite heart (top-right)
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: GestureDetector(
+                    onTap: () {
+                      ref.read(favoritesProvider.notifier).toggle(product.id);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.4),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isFav ? Icons.favorite : Icons.favorite_border,
+                        size: 18,
+                        color: isFav ? Colors.red : Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+
                 // Sold out overlay
                 if (product.effectiveStock <= 0)
                   Container(
@@ -68,9 +96,10 @@ class ProductCard extends StatelessWidget {
                         color: Colors.black,
                         child: Text(
                           'SOLD OUT',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.labelSmall?.copyWith(color: Colors.white),
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelSmall
+                              ?.copyWith(color: Colors.white),
                         ),
                       ),
                     ),
@@ -83,12 +112,26 @@ class ProductCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             product.name,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.copyWith(fontWeight: FontWeight.w700),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
+          if (product.brand != null && product.brand!.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Text(
+              product.brand!.toUpperCase(),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Colors.grey[600],
+                    letterSpacing: 1,
+                    fontSize: 10,
+                  ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
           const SizedBox(height: 4),
           Row(
             children: [
@@ -111,9 +154,10 @@ class ProductCard extends StatelessWidget {
               ] else ...[
                 Text(
                   '${product.price.toStringAsFixed(2)} €',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ],
             ],

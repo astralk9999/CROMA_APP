@@ -18,11 +18,11 @@ class CheckoutRepository {
 }
 
 @riverpod
-CheckoutRepository checkoutRepository(CheckoutRepositoryRef ref) {
+CheckoutRepository checkoutRepository(Ref ref) {
   return CheckoutRepository();
 }
 
 @riverpod
-Future<Order> orderDetail(OrderDetailRef ref, String orderId) {
+Future<Order> orderDetail(Ref ref, String orderId) {
   return ref.read(checkoutRepositoryProvider).getOrderById(orderId);
 }

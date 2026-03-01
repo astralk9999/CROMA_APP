@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../shared/models/cart_item.dart';
-import '../../../../shared/models/product.dart';
 import '../../../../shared/widgets/croma_app_bar.dart';
 import '../../../../shared/widgets/scroll_fading_widget.dart';
 import '../../../shop/data/shop_repository.dart';

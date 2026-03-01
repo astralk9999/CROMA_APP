@@ -30,7 +30,7 @@ class _ProductGalleryState extends State<ProductGallery> {
     if (widget.images.isEmpty) {
       return Container(
         height: 500,
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: const Center(
           child: Icon(Icons.image_not_supported, color: Colors.grey),
         ),
@@ -72,7 +72,7 @@ class _ProductGalleryState extends State<ProductGallery> {
                   count: widget.images.length,
                   effect: ExpandingDotsEffect(
                     activeDotColor: Colors.black,
-                    dotColor: Colors.black.withOpacity(0.3),
+                    dotColor: Colors.black.withValues(alpha: 0.3),
                     dotHeight: 4,
                     dotWidth: 8,
                     spacing: 4,

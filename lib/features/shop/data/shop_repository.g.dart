@@ -6,7 +6,7 @@ part of 'shop_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$shopRepositoryHash() => r'9f5379d716fcb45a949d95e8613c7e1bc3dd2548';
+String _$shopRepositoryHash() => r'2162ea6b28a4b51959565eb151b63fd46afe50fc';
 
 /// See also [shopRepository].
 @ProviderFor(shopRepository)
@@ -23,7 +23,7 @@ final shopRepositoryProvider = AutoDisposeProvider<ShopRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ShopRepositoryRef = AutoDisposeProviderRef<ShopRepository>;
-String _$productsHash() => r'bb45560299d86ac370efaacfeeb83512382c345d';
+String _$productsHash() => r'5fe338d92858a018ff1a790f82a39f563015ac35';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -161,7 +161,7 @@ class _ProductsProviderElement
   String? get categoryId => (origin as ProductsProvider).categoryId;
 }
 
-String _$productDetailHash() => r'eb9bcf12f142dd91814861c31254c0ef139aae5b';
+String _$productDetailHash() => r'3019ecdd747a316e5b00f352d370a3d16f97f336';
 
 /// See also [productDetail].
 @ProviderFor(productDetail)
@@ -281,7 +281,7 @@ class _ProductDetailProviderElement
   String get slug => (origin as ProductDetailProvider).slug;
 }
 
-String _$categoriesHash() => r'075a62226391a438a388af9da0b47967ac11aec7';
+String _$categoriesHash() => r'603aba63805d3133151428c101cbbd4814d8361b';
 
 /// See also [categories].
 @ProviderFor(categories)

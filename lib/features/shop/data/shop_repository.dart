@@ -94,21 +94,21 @@ class ShopRepository {
 }
 
 @riverpod
-ShopRepository shopRepository(ShopRepositoryRef ref) {
+ShopRepository shopRepository(Ref ref) {
   return ShopRepository();
 }
 
 @riverpod
-Future<List<Product>> products(ProductsRef ref, {String? categoryId}) {
+Future<List<Product>> products(Ref ref, {String? categoryId}) {
   return ref.read(shopRepositoryProvider).getProducts(categoryId: categoryId);
 }
 
 @riverpod
-Future<Product> productDetail(ProductDetailRef ref, String slug) {
+Future<Product> productDetail(Ref ref, String slug) {
   return ref.read(shopRepositoryProvider).getProductBySlug(slug);
 }
 
 @riverpod
-Future<List<Category>> categories(CategoriesRef ref) {
+Future<List<Category>> categories(Ref ref) {
   return ref.read(shopRepositoryProvider).getCategories();
 }

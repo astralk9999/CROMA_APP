@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../../shared/widgets/croma_app_bar.dart';
-import '../../../../shared/widgets/croma_bottom_nav.dart';
 import '../../../../shared/widgets/scroll_fading_widget.dart';
 
 class AboutScreen extends StatelessWidget {

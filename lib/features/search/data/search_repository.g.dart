@@ -6,7 +6,7 @@ part of 'search_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$searchRepositoryHash() => r'8af75049dc278e6405e935f009af698a3f6214aa';
+String _$searchRepositoryHash() => r'fadfc43d38190fcb9c1251829db2e664efcf7f9a';
 
 /// See also [searchRepository].
 @ProviderFor(searchRepository)
@@ -23,7 +23,7 @@ final searchRepositoryProvider = AutoDisposeProvider<SearchRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef SearchRepositoryRef = AutoDisposeProviderRef<SearchRepository>;
-String _$availableBrandsHash() => r'2ee5ec97e36f5e8cef6245da5c9b4c4837d2269d';
+String _$availableBrandsHash() => r'b689d1ea4a90acf2b9f3b3dedb972d27275e67f2';
 
 /// See also [availableBrands].
 @ProviderFor(availableBrands)
@@ -41,7 +41,7 @@ final availableBrandsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AvailableBrandsRef = AutoDisposeFutureProviderRef<List<String>>;
-String _$availableColorsHash() => r'05f341847a72275e70f76962d1c6683d5a62780e';
+String _$availableColorsHash() => r'506b76d4f88633297ddd354d9fb18b0b4bf9d3e5';
 
 /// See also [availableColors].
 @ProviderFor(availableColors)

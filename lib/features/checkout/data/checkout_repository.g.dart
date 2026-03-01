@@ -7,7 +7,7 @@ part of 'checkout_repository.dart';
 // **************************************************************************
 
 String _$checkoutRepositoryHash() =>
-    r'586698e9931402efcb8fb0e7cff1c721f2b8433a';
+    r'f4d30fe6c0a1fbeaabec4fcc07afd69a27cce43c';
 
 /// See also [checkoutRepository].
 @ProviderFor(checkoutRepository)
@@ -25,7 +25,7 @@ final checkoutRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CheckoutRepositoryRef = AutoDisposeProviderRef<CheckoutRepository>;
-String _$orderDetailHash() => r'7cd3dcf565775897ece60f0bcb11ded52f6931e9';
+String _$orderDetailHash() => r'dba663299fb270db9a61a54806cbf12dc35cd31c';
 
 /// Copied from Dart SDK
 class _SystemHash {

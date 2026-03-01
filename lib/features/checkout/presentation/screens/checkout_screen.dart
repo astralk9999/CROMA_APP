@@ -118,7 +118,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final finalTotal = cartTotal + shippingCost;
 
     return Scaffold(
-      appBar: const CromaAppBar(showCart: false),
+      appBar: const CromaAppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Form(

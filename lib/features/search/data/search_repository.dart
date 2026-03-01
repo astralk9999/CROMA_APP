@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../../../../shared/models/product.dart';
-import '../../../../shared/models/category.dart';
 
 part 'search_repository.g.dart';
 
@@ -84,16 +83,16 @@ class SearchRepository {
 }
 
 @riverpod
-SearchRepository searchRepository(SearchRepositoryRef ref) {
+SearchRepository searchRepository(Ref ref) {
   return SearchRepository();
 }
 
 @riverpod
-Future<List<String>> availableBrands(AvailableBrandsRef ref) {
+Future<List<String>> availableBrands(Ref ref) {
   return ref.read(searchRepositoryProvider).getAvailableBrands();
 }
 
 @riverpod
-Future<List<String>> availableColors(AvailableColorsRef ref) {
+Future<List<String>> availableColors(Ref ref) {
   return ref.read(searchRepositoryProvider).getAvailableColors();
 }

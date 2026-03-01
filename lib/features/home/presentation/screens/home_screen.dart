@@ -20,8 +20,7 @@ class HomeScreen extends ConsumerWidget {
     final limitedDropsAsync = ref.watch(limitedDropsProvider);
     final viralTrendsAsync = ref.watch(viralTrendsProvider);
     final discountsAsync = ref.watch(discountedProductsProvider);
-    final categoriesAsync = ref.watch(categoriesProvider);
-
+    final discountsAsync = ref.watch(discountedProductsProvider);
     return Scaffold(
       appBar: const CromaAppBar(),
       body: SingleChildScrollView(
@@ -585,67 +584,6 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  // ─── CATEGORIES GRID ───
-  Widget _buildCategoriesGrid(
-      BuildContext context, List<dynamic> categories) {
-    if (categories.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 1.4,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-        ),
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final cat = categories[index];
-          return GestureDetector(
-            onTap: () => context.push('/shop?category=${cat.id}'),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black,
-                border: Border.all(color: Colors.black, width: 2),
-              ),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.grey[900]!,
-                          Colors.black,
-                        ],
-                      ),
-                    ),
-                  ),
-                  Center(
-                    child: Text(
-                      cat.name.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 3,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   // ─── HORIZONTAL CAROUSEL ───
   Widget _buildHorizontalCarousel(
       BuildContext context, List<Product> products) {
@@ -796,7 +734,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.03)
+      ..color = Colors.white.withValues(alpha: 0.03)
       ..strokeWidth = 0.5;
 
     const spacing = 40.0;

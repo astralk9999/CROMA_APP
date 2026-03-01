@@ -221,7 +221,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 _loadUserData();
               } catch (e) {
                 if (ctx.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(ctx).showSnackBar(
                     SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
                   );
                 }

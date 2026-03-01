@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import '../constants/api_constants.dart';
 import 'dio_client.dart';

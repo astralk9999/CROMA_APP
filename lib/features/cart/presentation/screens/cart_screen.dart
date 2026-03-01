@@ -14,7 +14,7 @@ class CartScreen extends ConsumerWidget {
     final cartState = ref.watch(cartNotifierProvider);
 
     return Scaffold(
-      appBar: const CromaAppBar(showCart: false),
+      appBar: const CromaAppBar(),
       body: cartState.when(
         data: (items) {
           if (items.isEmpty) {
@@ -179,7 +179,7 @@ class CartScreen extends ConsumerWidget {
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       offset: const Offset(0, -4),
                       blurRadius: 10,
                     ),

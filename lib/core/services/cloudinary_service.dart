@@ -1,5 +1,3 @@
-import '../config/app_config.dart';
-
 class CloudinaryService {
   static String getOptimizedUrl(String rawUrl, {int? width, int? height}) {
     if (rawUrl.isEmpty) return rawUrl;
@@ -22,14 +20,14 @@ class CloudinaryService {
         'q_auto',
       ]; // WebP/AVIF y calidad auto
 
-      if (width != null) transforms.add('w_\$width');
-      if (height != null) transforms.add('h_\$height');
+      if (width != null) transforms.add('w_$width');
+      if (height != null) transforms.add('h_$height');
 
       transforms.add('c_limit'); // No hacer upscale
 
-      final transformString = transforms.join(',') + '/';
+      final transformString = '${transforms.join(',')}/';
 
-      return basePath + transformString + restPath;
+      return '$basePath$transformString$restPath';
     } catch (e) {
       return rawUrl;
     }

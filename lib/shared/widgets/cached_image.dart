@@ -24,7 +24,7 @@ class CachedImage extends StatelessWidget {
       return Container(
         width: width,
         height: height,
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: const Icon(Icons.image_not_supported, color: Colors.grey),
       );
     }
@@ -43,7 +43,7 @@ class CachedImage extends StatelessWidget {
       placeholder: (context, url) => Container(
         width: width,
         height: height,
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: const Center(
           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
         ),
@@ -51,7 +51,7 @@ class CachedImage extends StatelessWidget {
       errorWidget: (context, url, error) => Container(
         width: width,
         height: height,
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: const Icon(Icons.broken_image, color: Colors.grey),
       ),
     );

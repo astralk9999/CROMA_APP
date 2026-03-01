@@ -71,7 +71,7 @@ class ProductCard extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.4),
+                        color: Colors.black.withValues(alpha: 0.4),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -86,7 +86,7 @@ class ProductCard extends ConsumerWidget {
                 // Sold out overlay
                 if (product.effectiveStock <= 0)
                   Container(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                     child: Center(
                       child: Container(
                         padding: const EdgeInsets.symmetric(

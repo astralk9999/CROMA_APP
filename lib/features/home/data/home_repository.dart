@@ -64,31 +64,31 @@ class HomeRepository {
 }
 
 @riverpod
-HomeRepository homeRepository(HomeRepositoryRef ref) {
+HomeRepository homeRepository(Ref ref) {
   return HomeRepository();
 }
 
 @riverpod
-Future<List<Product>> bestSellers(BestSellersRef ref) {
+Future<List<Product>> bestSellers(Ref ref) {
   return ref.read(homeRepositoryProvider).getBestSellers();
 }
 
 @riverpod
-Future<List<Product>> viralTrends(ViralTrendsRef ref) {
+Future<List<Product>> viralTrends(Ref ref) {
   return ref.read(homeRepositoryProvider).getViralTrends();
 }
 
 @riverpod
-Future<List<Product>> limitedDrops(LimitedDropsRef ref) {
+Future<List<Product>> limitedDrops(Ref ref) {
   return ref.read(homeRepositoryProvider).getLimitedDrops();
 }
 
 @riverpod
-Future<List<Product>> discountedProducts(DiscountedProductsRef ref) {
+Future<List<Product>> discountedProducts(Ref ref) {
   return ref.read(homeRepositoryProvider).getDiscountedProducts();
 }
 
 @riverpod
-Future<List<Product>> comingSoon(ComingSoonRef ref) {
+Future<List<Product>> comingSoon(Ref ref) {
   return ref.read(homeRepositoryProvider).getComingSoon();
 }

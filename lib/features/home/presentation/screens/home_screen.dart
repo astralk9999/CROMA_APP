@@ -210,21 +210,6 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
 
-            // ═══════════════════════════════════════════
-            // ─── CATEGORÍAS ───
-            // ═══════════════════════════════════════════
-            const SizedBox(height: 48),
-            _buildSectionHeader(context, 'CATEGORÍAS'),
-            const SizedBox(height: 24),
-            categoriesAsync.when(
-              data: (categories) => _buildCategoriesGrid(context, categories),
-              loading: () => const SizedBox(
-                height: 200,
-                child: Center(
-                    child: CircularProgressIndicator(color: Colors.black)),
-              ),
-              error: (_, __) => const SizedBox.shrink(),
-            ),
 
             // ═══════════════════════════════════════════
             // ─── TENDENCIA ───

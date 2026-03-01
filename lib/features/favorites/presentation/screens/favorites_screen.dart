@@ -86,7 +86,7 @@ class FavoritesScreen extends ConsumerWidget {
         ),
         error: (err, _) => Center(child: Text('Error: $err')),
       ),
-      bottomNavigationBar: const CromaBottomNav(currentIndex: 2),
+      bottomNavigationBar: const CromaBottomNav(currentIndex: 3),
     );
   }
 }

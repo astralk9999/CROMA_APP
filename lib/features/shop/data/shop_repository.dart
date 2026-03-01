@@ -9,6 +9,7 @@ class ShopRepository {
   final _client = SupabaseService.client;
 
   Future<List<Product>> getProducts({
+    String? query,
     String? categoryId,
     String? brand,
     String? color,
@@ -17,12 +18,18 @@ class ShopRepository {
     bool? isViralTrend,
     bool? isBestseller,
     bool? featured,
+    double? minPrice,
+    double? maxPrice,
     String sortBy = 'created_at',
     bool sortAsc = false,
     int page = 0,
     int pageSize = 20,
   }) async {
     var request = _client.from('products').select().eq('is_hidden', false);
+
+    if (query != null && query.isNotEmpty) {
+      request = request.ilike('name', '%$query%');
+    }
 
     if (categoryId != null && categoryId.isNotEmpty) {
       request = request.eq('category_id', categoryId);
@@ -44,6 +51,12 @@ class ShopRepository {
     }
     if (isBestseller == true) {
       request = request.eq('is_bestseller', true);
+    }
+    if (minPrice != null) {
+      request = request.gte('price', minPrice);
+    }
+    if (maxPrice != null) {
+      request = request.lte('price', maxPrice);
     }
 
     final from = page * pageSize;

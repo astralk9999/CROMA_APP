@@ -14,23 +14,13 @@ class CromaAppBar extends StatelessWidget implements PreferredSizeWidget {
         onTap: () => context.go('/'),
         child: Image.asset(
           'assets/images/chromakopia_logo.png',
-          height: 40,
+          height: 60,
           color: Colors.white,
         ),
       ),
       centerTitle: true,
-      actions: [
-        if (showSearch)
-          IconButton(
-            icon: const Icon(Icons.search, size: 24),
-            onPressed: () => context.push('/search'),
-          ),
-        if (showCart)
-          IconButton(
-            icon: const Icon(Icons.shopping_bag_outlined, size: 22),
-            onPressed: () => context.push('/cart'),
-          ),
-      ],
+      elevation: 0,
+      backgroundColor: Colors.black,
     );
   }
 

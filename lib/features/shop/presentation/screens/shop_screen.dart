@@ -21,9 +21,13 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
   String? _selectedBrand;
   String? _selectedColor;
   String? _selectedEspecial; // 'limited', 'discount', 'viral', 'bestseller'
+  String _searchQuery = '';
+  double? _minPrice;
+  double? _maxPrice;
   String _sortBy = 'created_at';
   bool _sortAsc = false;
   String _sortLabel = 'Más recientes';
+  final TextEditingController _searchController = TextEditingController();
   final List<Product> _products = [];
   bool _isLoading = false;
   bool _hasMore = true;
@@ -55,6 +59,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 
   int get _activeFilterCount {
     int count = 0;
+    if (_searchQuery.isNotEmpty) count++;
+    if (_minPrice != null || _maxPrice != null) count++;
     if (_selectedCategoryId != null) count++;
     if (_selectedBrand != null) count++;
     if (_selectedColor != null) count++;
@@ -75,6 +81,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     try {
       final repo = ref.read(shopRepositoryProvider);
       final newProducts = await repo.getProducts(
+        query: _searchQuery,
         categoryId: _selectedCategoryId,
         brand: _selectedBrand,
         color: _selectedColor,
@@ -82,6 +89,8 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
         hasDiscount: _selectedEspecial == 'discount' ? true : null,
         isViralTrend: _selectedEspecial == 'viral' ? true : null,
         isBestseller: _selectedEspecial == 'bestseller' ? true : null,
+        minPrice: _minPrice,
+        maxPrice: _maxPrice,
         sortBy: _sortBy,
         sortAsc: _sortAsc,
         page: _currentPage,
@@ -108,6 +117,10 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 
   void _clearAllFilters() {
     setState(() {
+      _searchQuery = '';
+      _searchController.clear();
+      _minPrice = null;
+      _maxPrice = null;
       _selectedCategoryId = null;
       _selectedBrand = null;
       _selectedColor = null;
@@ -168,6 +181,10 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                       _selectedBrand = null;
                                       _selectedColor = null;
                                       _selectedEspecial = null;
+                                      _minPrice = null;
+                                      _maxPrice = null;
+                                      _searchController.clear();
+                                      _searchQuery = '';
                                     });
                                   },
                                   child: const Text(
@@ -211,6 +228,44 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
                                     _selectedEspecial == value ? null : value;
                               });
                             },
+                          ),
+
+                          const SizedBox(height: 24),
+                          const Divider(color: Colors.black12),
+                          const SizedBox(height: 24),
+
+                          // ─── PRECIO ───
+                          const Text(
+                            'PRECIO',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 14,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          RangeSlider(
+                            values: RangeValues(_minPrice ?? 0, _maxPrice ?? 500),
+                            min: 0,
+                            max: 500,
+                            divisions: 50,
+                            activeColor: Colors.black,
+                            inactiveColor: Colors.black12,
+                            labels: RangeLabels(
+                                '€${(_minPrice ?? 0).toInt()}', '€${(_maxPrice ?? 500).toInt()}'),
+                            onChanged: (values) {
+                              setModalState(() {
+                                _minPrice = values.start;
+                                _maxPrice = values.end;
+                              });
+                            },
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('€${(_minPrice ?? 0).toInt()}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('€${(_maxPrice ?? 500).toInt()}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                            ],
                           ),
 
                           const SizedBox(height: 24),
@@ -492,9 +547,47 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // ─── Search Bar ───
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Buscar prendas, marcas, colores...',
+                prefixIcon: const Icon(Icons.search, color: Colors.black),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, color: Colors.black),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                          _loadProducts(reset: true);
+                        },
+                      )
+                    : null,
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: Colors.black, width: 2),
+                ),
+                focusedBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.zero,
+                  borderSide: BorderSide(color: Colors.black, width: 2),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+              onSubmitted: (value) {
+                setState(() => _searchQuery = value);
+                _loadProducts(reset: true);
+              },
+              onChanged: (value) {
+                setState(() {});
+              },
+            ),
+          ),
+
           // ─── Header ───
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

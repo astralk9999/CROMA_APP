@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class CromaAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final bool showCart;
-  final bool showSearch;
+  const CromaAppBar({super.key});
 
-  const CromaAppBar({super.key, this.showCart = true, this.showSearch = true});
+  @override
+  Size get preferredSize => const Size.fromHeight(80.0);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      toolbarHeight: 80.0,
       title: GestureDetector(
         onTap: () => context.go('/'),
         child: Image.asset(
           'assets/images/chromakopia_logo.png',
-          height: 60,
+          height: 60, // Much larger logo
           color: Colors.white,
         ),
       ),
@@ -23,7 +24,4 @@ class CromaAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Colors.black,
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

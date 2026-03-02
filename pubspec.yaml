@@ -59,6 +59,7 @@ dev_dependencies:
   json_serializable: ^6.9.4
   build_runner: ^2.4.14
   riverpod_generator: ^2.6.3
+  flutter_launcher_icons: ^0.13.1
 
 dependency_overrides:
   build_resolvers: 2.4.3
@@ -70,3 +71,13 @@ flutter:
   assets:
     - .env
     - assets/images/
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo_c_horns.png"
+  web:
+    generate: true
+    image_path: "assets/images/logo_c_horns.png"
+    background_color: "#ffffff"
+    theme_color: "#000000"

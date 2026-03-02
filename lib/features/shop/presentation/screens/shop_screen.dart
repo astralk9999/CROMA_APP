@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/widgets/croma_app_bar.dart';
 import '../../../../shared/widgets/croma_bottom_nav.dart';
 import '../../../../shared/widgets/product_card.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
@@ -636,63 +635,85 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
 
     return Scaffold(
       extendBody: true,
-      appBar: const CromaAppBar(),
+      // AppBar removido para evitar problemas directos
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // ─── Global Shop Header ───
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Container(
+            padding: EdgeInsets.fromLTRB(24, MediaQuery.of(context).padding.top + 16, 24, 16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                bottom: BorderSide(color: Colors.black12, width: 1),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (_showGrid) ...[
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Color(0xFF202020)),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () {
-                          setState(() {
-                            _showGrid = false;
-                            _clearAllFilters(resetGrid: true);
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 12),
-                    ],
-                    Text(
-                      'SHOP',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 3,
-                            fontSize: 24,
+                    Row(
+                      children: [
+                        if (_showGrid) ...[
+                          IconButton(
+                            icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: Color(0xFF202020)),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: () {
+                              setState(() {
+                                _showGrid = false;
+                                _clearAllFilters(resetGrid: true);
+                              });
+                            },
                           ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        _isSearchExpanded ? Icons.search_off_rounded : Icons.search_rounded,
-                        color: const Color(0xFF202020),
-                      ),
-                      onPressed: () => setState(() => _isSearchExpanded = !_isSearchExpanded),
-                    ),
-                    if (_showGrid) ...[
-                      const SizedBox(width: 8),
-                      // Filter button (moved here for cleaner UI)
-                      IconButton(
-                        icon: Badge(
-                          isLabelVisible: _activeFilterCount > 0,
-                          label: Text(_activeFilterCount.toString()),
-                          child: const Icon(Icons.tune, color: Color(0xFF202020)),
+                          const SizedBox(width: 16),
+                        ],
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _showGrid 
+                                ? (_selectedCategoryId != null ? 'CATEGORÍA' : (_selectedBrand != null ? 'MARCA' : 'COLECCIÓN'))
+                                : 'PRODUCTOS',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 2,
+                                color: Colors.black38,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'SHOP',
+                              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 4,
+                                    fontSize: 28,
+                                    height: 1.1,
+                                  ),
+                            ),
+                          ],
                         ),
-                        onPressed: () => _showFilterDrawer(ref.read(availableBrandsProvider), ref.read(availableColorsProvider)),
-                      ),
-                    ],
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        _HeaderCircleButton(
+                          icon: _isSearchExpanded ? Icons.close : Icons.search,
+                          onPressed: () => setState(() => _isSearchExpanded = !_isSearchExpanded),
+                        ),
+                        if (_showGrid) ...[
+                          const SizedBox(width: 12),
+                          _HeaderCircleButton(
+                            icon: Icons.tune,
+                            badgeCount: _activeFilterCount > 0 ? _activeFilterCount : null,
+                            onPressed: () => _showFilterDrawer(ref.read(availableBrandsProvider), ref.read(availableColorsProvider)),
+                          ),
+                        ],
+                      ],
+                    ),
                   ],
                 ),
               ],
@@ -1085,3 +1106,37 @@ class _FilterOption {
   final String value;
   const _FilterOption(this.label, this.value);
 }
+
+class _HeaderCircleButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+  final int? badgeCount;
+
+  const _HeaderCircleButton({
+    required this.icon,
+    required this.onPressed,
+    this.badgeCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Badge(
+        isLabelVisible: badgeCount != null,
+        label: Text(badgeCount?.toString() ?? '', style: const TextStyle(fontSize: 8, color: Colors.white)),
+        backgroundColor: Colors.black,
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F5F0),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.black12, width: 1),
+          ),
+          child: Icon(icon, size: 20, color: const Color(0xFF202020)),
+        ),
+      ),
+    );
+  }
+}
+

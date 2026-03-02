@@ -32,11 +32,31 @@ class AccountRepository {
 
     final order = Order.fromJson(data);
     
-    // Manually map order items if needed (Order model has transient items field)
+    // Manually map order items and ensure product_image is populated from the joined product if missing
     final itemsData = data['order_items'] as List;
-    final items = itemsData.map((e) => OrderItem.fromJson(e)).toList();
+    final items = itemsData.map((e) {
+      final itemMap = Map<String, dynamic>.from(e);
+      // If product_image is null or empty, try to get it from the joined product
+      if ((itemMap['product_image'] == null || itemMap['product_image'] == '') && itemMap['product'] != null) {
+        final productImages = itemMap['product']['images'] as List?;
+        if (productImages != null && productImages.isNotEmpty) {
+          itemMap['product_image'] = productImages.first;
+        }
+      }
+      return OrderItem.fromJson(itemMap);
+    }).toList();
     
     return order.copyWith(items: items);
+  }
+
+  Future<void> updateOrderStatus(String orderId, String newStatus) async {
+    final user = _client.auth.currentUser;
+    if (user == null) throw Exception('No autorizado');
+
+    await _client
+        .from('orders')
+        .update({'status': newStatus})
+        .match({'id': orderId, 'user_id': user.id});
   }
 
   Future<List<ReturnRequest>> getUserReturns() async {

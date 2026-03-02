@@ -16,6 +16,13 @@ class DioClient {
   );
 
   static void initialize() {
+    _dio.interceptors.add(LogInterceptor(
+      requestHeader: true,
+      requestBody: true,
+      responseHeader: true,
+      responseBody: true,
+      error: true,
+    ));
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {

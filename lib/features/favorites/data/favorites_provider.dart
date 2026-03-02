@@ -52,7 +52,7 @@ class FavoritesNotifier extends StateNotifier<Set<String>> {
         );
       }
     } catch (e) {
-      print('Error syncing favorites: $e');
+      // Error handles
     }
   }
 
@@ -83,7 +83,7 @@ class FavoritesNotifier extends StateNotifier<Set<String>> {
           await _supabase.from('favorites').delete().eq('user_id', user.id).eq('product_id', productId);
         }
       } catch (e) {
-        print('Error toggling remote favorite: $e');
+        // Error handles
       }
     }
   }
@@ -97,11 +97,25 @@ class FavoritesNotifier extends StateNotifier<Set<String>> {
       await _supabase.from('favorites').delete().eq('user_id', user.id).eq('product_id', productId);
     }
   }
-}
 
+  Future<void> clear() async {
+    state = {};
+    await _save();
+  }
+}
 final favoritesProvider =
     StateNotifierProvider<FavoritesNotifier, Set<String>>((ref) {
-  return FavoritesNotifier();
+  final notifier = FavoritesNotifier();
+
+  ref.listen(authNotifierProvider, (previous, next) {
+    if (next != null && previous?.id != next.id) {
+      notifier.syncWithSupabase();
+    } else if (next == null && previous != null) {
+      notifier.clear();
+    }
+  });
+
+  return notifier;
 });
 
 final favoriteProductsProvider = FutureProvider<List<Product>>((ref) async {

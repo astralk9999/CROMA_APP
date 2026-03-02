@@ -57,7 +57,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     return productAsync.when(
       data: (product) {
         return Scaffold(
-          appBar: const CromaAppBar(),
+          // AppBar removido para evitar problemas directos
           body: Stack(
             children: [
               SingleChildScrollView(
@@ -111,7 +111,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                   children: [
                                     if (product.discountActive == true || (product.salePrice != null && product.salePrice! < product.price)) ...[
                                       Text(
-                                        '${(product.salePrice ?? product.price).toStringAsFixed(2)} €',
+                                        '${((product.salePrice ?? product.price).isFinite ? (product.salePrice ?? product.price) : 0.0).toStringAsFixed(2)} €',
                                         style: Theme.of(context)
                                             .textTheme
                                             .headlineMedium
@@ -122,7 +122,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                             ),
                                       ),
                                       Text(
-                                        '${product.price.toStringAsFixed(2)} €',
+                                        '${(product.price.isFinite ? product.price : 0.0).toStringAsFixed(2)} €',
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyLarge
@@ -134,7 +134,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                       ),
                                     ] else ...[
                                       Text(
-                                        '${product.price.toStringAsFixed(2)} €',
+                                        '${(product.price.isFinite ? product.price : 0.0).toStringAsFixed(2)} €',
                                         style: Theme.of(
                                           context,
                                         ).textTheme.headlineMedium,
@@ -163,9 +163,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             const SizedBox(height: 16),
                             _buildDetailRow(
                               isEs ? 'Color' : 'Color',
-                              product.colors.isNotEmpty 
-                                ? product.colors.join(', ') 
-                                : (isEs ? 'N/A' : 'N/A'),
+                              (product.colors.isNotEmpty && product.colors.any((c) => c.trim().isNotEmpty)) 
+                                ? product.colors.where((c) => c.trim().isNotEmpty).join(' / ').toUpperCase() 
+                                : (isEs ? 'COLOR ÚNICO' : 'ONE COLOR'),
                             ),
                             if (product.category != null) ...[
                               const SizedBox(height: 8),
@@ -244,6 +244,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       ),
                     );
                   },
+                ),
+              ),
+              // Back Button (Floating)
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 10,
+                left: 16,
+                child: CircleAvatar(
+                  backgroundColor: Colors.white.withValues(alpha: 0.8),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () => context.pop(),
+                  ),
                 ),
               ),
             ],

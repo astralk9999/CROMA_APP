@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/widgets/croma_app_bar.dart';
 import '../../../../shared/widgets/scroll_fading_widget.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -8,7 +7,7 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CromaAppBar(),
+      // AppBar removido para evitar problemas directos
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
         child: Column(

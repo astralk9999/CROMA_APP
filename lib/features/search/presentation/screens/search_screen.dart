@@ -117,18 +117,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        title: Image.asset(
-          'assets/images/chromakopia_logo.png',
-          height: 24,
-          color: Colors.white,
-        ),
-        centerTitle: true,
-      ),
+      // AppBar removido para evitar problemas directos
       body: SafeArea(
         child: Column(
           children: [
@@ -137,6 +126,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Row(
                 children: [
+                   IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => context.pop(),
+                  ),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Container(
                       height: 48,

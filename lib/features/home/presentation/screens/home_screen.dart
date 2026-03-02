@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/widgets/croma_app_bar.dart';
 import '../../../../shared/widgets/croma_bottom_nav.dart';
 import '../../../../shared/widgets/scroll_fading_widget.dart';
 import '../../../../shared/widgets/product_card.dart';
@@ -22,7 +21,7 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       extendBody: true,
-      appBar: const CromaAppBar(),
+      // AppBar removido para evitar problemas directos
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -42,41 +41,42 @@ class HomeScreen extends ConsumerWidget {
                       child: CustomPaint(painter: _GridPainter()),
                     ),
                     Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
+                        const SizedBox(height: 20),
                         Image.asset(
-                          'assets/images/logo_c_horns.png',
-                          height: 100,
+                          'assets/images/chromakopia_logo.png',
+                          height: 220, // Adjusted as requested
                           color: Colors.white,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 1), // Reduced gap for tighter grouping
                         const Text(
                           'URBAN COLLECTIVE',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 28,
+                            fontSize: 32,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 8,
+                            letterSpacing: 10,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         const Text(
                           'STREETWEAR CULTURE',
                           style: TextStyle(
                             color: Colors.white60,
-                            fontSize: 12,
-                            letterSpacing: 6,
+                            fontSize: 14,
+                            letterSpacing: 8,
                           ),
                         ),
-                        const SizedBox(height: 36),
+                        const SizedBox(height: 48),
                         OutlinedButton(
                           onPressed: () => context.go('/shop'),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: Colors.white, width: 2),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 48,
-                              vertical: 18,
+                              horizontal: 56,
+                              vertical: 20,
                             ),
                             shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.zero,

@@ -61,7 +61,7 @@ class SizeSelectorSheet extends StatelessWidget {
                   width:
                       (MediaQuery.of(context).size.width - 48 - 36) /
                       4, // 4 items per row
-                  height: 60,
+                  height: 65,
                   decoration: BoxDecoration(
                     color: isSelected ? const Color(0xFF202020) : Colors.white,
                     border: Border.all(
@@ -76,15 +76,18 @@ class SizeSelectorSheet extends StatelessWidget {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      Text(
-                        size,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: isOutOfStock
-                              ? Colors.grey.shade400
-                              : isSelected
-                              ? Colors.white
-                              : const Color(0xFF202020),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          size,
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: isOutOfStock
+                                ? Colors.grey.shade400
+                                : isSelected
+                                ? Colors.white
+                                : const Color(0xFF202020),
+                          ),
                         ),
                       ),
                       if (isOutOfStock)
@@ -98,20 +101,22 @@ class SizeSelectorSheet extends StatelessWidget {
                             ),
                           ),
                         ),
-                      if (!isOutOfStock && stock <= 3)
-                        Positioned(
-                          bottom: 4,
-                          child: Text(
-                            'Quedan $stock',
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  fontSize: 8,
-                                  color: isSelected
-                                      ? Colors.red.shade300
-                                      : Colors.red,
-                                ),
-                          ),
+                      Positioned(
+                        bottom: 4,
+                        child: Text(
+                          isOutOfStock ? 'SIN STOCK' : '$stock DISP.',
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w900,
+                                color: isOutOfStock
+                                    ? Colors.grey.shade400
+                                    : isSelected
+                                        ? Colors.white
+                                        : (stock <= 3 ? Colors.red : Colors.black87),
+                              ),
                         ),
+                      ),
                     ],
                   ),
                 ),

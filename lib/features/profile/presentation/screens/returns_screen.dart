@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../data/account_repository.dart';
-import '../../../../shared/widgets/croma_app_bar.dart';
 import '../../../../shared/widgets/croma_loading.dart';
 import '../../../../core/providers/language_provider.dart';
 
@@ -16,47 +16,61 @@ class ReturnsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CromaAppBar(
-        title: Text(
-          isEs ? 'MIS DEVOLUCIONES' : 'MY RETURNS',
-          style: const TextStyle(
-            color: Color(0xFF202020),
-            fontSize: 14,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 2,
-          ),
-        ),
-      ),
-      body: returnsAsync.when(
-        data: (returns) {
-          if (returns.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.assignment_return_outlined, size: 64, color: Colors.black12),
-                  const SizedBox(height: 16),
-                  Text(
-                    isEs ? 'No tienes solicitudes de devolución' : 'No return requests yet',
-                    style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600),
-                  ),
-                ],
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            pinned: true,
+            centerTitle: true,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () => context.pop(),
+            ),
+            title: Text(
+              isEs ? 'MIS DEVOLUCIONES' : 'MY RETURNS',
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2.0,
               ),
-            );
-          }
+            ),
+          ),
+          SliverFillRemaining(
+            child: returnsAsync.when(
+              data: (returns) {
+                if (returns.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.assignment_return_outlined, size: 64, color: Colors.black12),
+                        const SizedBox(height: 16),
+                        Text(
+                          isEs ? 'No tienes solicitudes de devolución' : 'No return requests yet',
+                          style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  );
+                }
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(24),
-            itemCount: returns.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 16),
-            itemBuilder: (context, index) {
-              final request = returns[index];
-              return _ReturnCard(request: request, isEs: isEs);
-            },
-          );
-        },
-        loading: () => const Center(child: CromaLoading()),
-        error: (e, __) => Center(child: Text('Error: $e')),
+                return ListView.separated(
+                  padding: const EdgeInsets.all(24),
+                  itemCount: returns.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 16),
+                  itemBuilder: (context, index) {
+                    final request = returns[index];
+                    return _ReturnCard(request: request, isEs: isEs);
+                  },
+                );
+              },
+              loading: () => const Center(child: CromaLoading()),
+              error: (e, __) => Center(child: Text('Error: \$e')),
+            ),
+          ),
+        ],
       ),
     );
   }

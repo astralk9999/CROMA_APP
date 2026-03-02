@@ -24,3 +24,4 @@ plugins {
 }
 
 include(":app")
+rootProject.name = "fashion_croma_android"

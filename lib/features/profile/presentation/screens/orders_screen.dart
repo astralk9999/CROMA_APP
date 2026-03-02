@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../data/account_repository.dart';
-import '../../../../shared/widgets/croma_app_bar.dart';
 import '../../../../shared/widgets/croma_loading.dart';
+import '../../../../shared/widgets/cached_image.dart';
 import '../../../../core/providers/language_provider.dart';
 
 class OrdersScreen extends ConsumerWidget {
@@ -17,47 +17,61 @@ class OrdersScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CromaAppBar(
-        title: Text(
-          isEs ? 'MIS PEDIDOS' : 'MY ORDERS',
-          style: const TextStyle(
-            color: Color(0xFF202020),
-            fontSize: 14,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 2,
-          ),
-        ),
-      ),
-      body: ordersAsync.when(
-        data: (orders) {
-          if (orders.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.shopping_bag_outlined, size: 64, color: Colors.black12),
-                  const SizedBox(height: 16),
-                  Text(
-                    isEs ? 'No tienes pedidos aún' : 'No orders yet',
-                    style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600),
-                  ),
-                ],
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            pinned: true,
+            centerTitle: true,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () => context.pop(),
+            ),
+            title: Text(
+              isEs ? 'MIS PEDIDOS' : 'MY ORDERS',
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2.0,
               ),
-            );
-          }
+            ),
+          ),
+          SliverFillRemaining(
+            child: ordersAsync.when(
+              data: (orders) {
+                if (orders.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.shopping_bag_outlined, size: 64, color: Colors.black12),
+                        const SizedBox(height: 16),
+                        Text(
+                          isEs ? 'No tienes pedidos aún' : 'No orders yet',
+                          style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  );
+                }
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(24),
-            itemCount: orders.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 16),
-            itemBuilder: (context, index) {
-              final order = orders[index];
-              return _OrderCard(order: order, isEs: isEs);
-            },
-          );
-        },
-        loading: () => const Center(child: CromaLoading()),
-        error: (e, __) => Center(child: Text('Error: $e')),
+                return ListView.separated(
+                  padding: const EdgeInsets.all(24),
+                  itemCount: orders.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 16),
+                  itemBuilder: (context, index) {
+                    final order = orders[index];
+                    return _OrderCard(order: order, isEs: isEs);
+                  },
+                );
+              },
+              loading: () => const Center(child: CromaLoading()),
+              error: (e, __) => Center(child: Text('Error: \$e')),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -123,6 +137,30 @@ class _OrderCard extends StatelessWidget {
               style: const TextStyle(color: Colors.black54, fontSize: 12),
             ),
             const SizedBox(height: 16),
+            if (order.items.isNotEmpty) ...[
+              SizedBox(
+                height: 60,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: order.items.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (context, idx) {
+                    final item = order.items[idx];
+                    return Container(
+                      width: 45,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black12),
+                      ),
+                      child: item.productImage != null && item.productImage!.isNotEmpty
+                          ? CachedImage(imageUrl: item.productImage!, fit: BoxFit.cover)
+                          : const Icon(Icons.image_not_supported, color: Colors.black26),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
             const Divider(height: 1),
             const SizedBox(height: 16),
             Row(

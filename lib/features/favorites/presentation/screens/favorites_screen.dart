@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/widgets/croma_app_bar.dart';
 import '../../../../shared/widgets/croma_bottom_nav.dart';
 import '../../../../shared/widgets/product_card.dart';
 import '../../../../shared/widgets/loading_shimmer.dart';
@@ -23,7 +22,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
     return Scaffold(
       extendBody: true,
-      appBar: const CromaAppBar(),
+      // AppBar removido para evitar problemas directos
       body: favProductsAsync.when(
         data: (products) {
           if (products.isEmpty) {

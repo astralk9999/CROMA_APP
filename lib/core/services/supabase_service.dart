@@ -14,6 +14,14 @@ class SupabaseService {
 
   static SupabaseClient get client => Supabase.instance.client;
 
+  /// Admin client that bypasses RLS (use ONLY for testing/bypass)
+  static final SupabaseClient _adminClient = SupabaseClient(
+    AppConfig.supabaseUrl,
+    AppConfig.supabaseServiceRoleKey,
+  );
+
+  static SupabaseClient get adminClient => _adminClient;
+
   // Helpers
   static bool get isAuthenticated => client.auth.currentSession != null;
   static User? get currentUser => client.auth.currentUser;

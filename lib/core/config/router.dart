@@ -14,13 +14,24 @@ import '../../features/contact/presentation/screens/contact_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/profile/presentation/screens/orders_screen.dart';
 import '../../features/profile/presentation/screens/order_details_screen.dart';
+import '../../features/profile/presentation/screens/return_request_form_screen.dart';
 import '../../features/profile/presentation/screens/returns_screen.dart';
 import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
 import '../../features/admin/presentation/screens/admin_products_screen.dart';
 import '../../features/admin/presentation/screens/admin_orders_screen.dart';
 import '../../features/admin/presentation/screens/admin_users_screen.dart';
+import '../../features/admin/presentation/screens/admin_categories_screen.dart';
+import '../../features/admin/presentation/screens/admin_brands_screen.dart';
+import '../../features/admin/presentation/screens/admin_colors_screen.dart';
+import '../../features/admin/presentation/screens/admin_coupons_screen.dart';
+import '../../features/admin/presentation/screens/admin_returns_screen.dart';
+import '../../features/admin/presentation/screens/admin_marketing_screen.dart';
+import '../../features/admin/presentation/screens/admin_category_form_screen.dart';
+import '../../features/admin/presentation/screens/admin_color_form_screen.dart';
+import '../../features/admin/presentation/screens/admin_brand_form_screen.dart';
+import '../../features/admin/presentation/screens/admin_coupon_form_screen.dart';
+import '../../features/admin/presentation/screens/admin_product_form_screen.dart';
 import '../../features/auth/presentation/screens/auth_screen.dart';
-
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
 );
@@ -100,12 +111,84 @@ final goRouter = GoRouter(
           builder: (context, state) => const AdminProductsScreen(),
         ),
         GoRoute(
+          path: 'products/new',
+          builder: (context, state) => const AdminProductFormScreen(),
+        ),
+        GoRoute(
+          path: 'products/:id/edit',
+          builder: (context, state) => AdminProductFormScreen(productId: state.pathParameters['id']),
+        ),
+        GoRoute(
           path: 'orders',
           builder: (context, state) => const AdminOrdersScreen(),
         ),
         GoRoute(
+          path: 'orders/:id',
+          builder: (context, state) => OrderDetailsScreen(orderId: state.pathParameters['id']!),
+        ),
+        GoRoute(
+          path: 'orders/:id/return',
+          builder: (context, state) => ReturnRequestFormScreen(orderId: state.pathParameters['id']!),
+        ),
+        GoRoute(
           path: 'users',
           builder: (context, state) => const AdminUsersScreen(),
+        ),
+        GoRoute(
+          path: 'categories',
+          builder: (context, state) => const AdminCategoriesScreen(),
+        ),
+        GoRoute(
+          path: 'categories/new',
+          builder: (context, state) => const AdminCategoryFormScreen(),
+        ),
+        GoRoute(
+          path: 'categories/:id/edit',
+          builder: (context, state) => AdminCategoryFormScreen(categoryId: state.pathParameters['id']),
+        ),
+        GoRoute(
+          path: 'brands',
+          builder: (context, state) => const AdminBrandsScreen(),
+        ),
+        GoRoute(
+          path: 'brands/new',
+          builder: (context, state) => const AdminBrandFormScreen(),
+        ),
+        GoRoute(
+          path: 'brands/:id/edit',
+          builder: (context, state) => AdminBrandFormScreen(brandId: state.pathParameters['id']),
+        ),
+        GoRoute(
+          path: 'colors',
+          builder: (context, state) => const AdminColorsScreen(),
+        ),
+        GoRoute(
+          path: 'colors/new',
+          builder: (context, state) => const AdminColorFormScreen(),
+        ),
+        GoRoute(
+          path: 'colors/:id/edit',
+          builder: (context, state) => AdminColorFormScreen(colorId: state.pathParameters['id']),
+        ),
+        GoRoute(
+          path: 'coupons',
+          builder: (context, state) => const AdminCouponsScreen(),
+        ),
+        GoRoute(
+          path: 'coupons/new',
+          builder: (context, state) => const AdminCouponFormScreen(),
+        ),
+        GoRoute(
+          path: 'coupons/:id/edit',
+          builder: (context, state) => AdminCouponFormScreen(couponId: state.pathParameters['id']),
+        ),
+        GoRoute(
+          path: 'returns',
+          builder: (context, state) => const AdminReturnsScreen(),
+        ),
+        GoRoute(
+          path: 'marketing',
+          builder: (context, state) => const AdminMarketingScreen(),
         ),
       ],
     ),

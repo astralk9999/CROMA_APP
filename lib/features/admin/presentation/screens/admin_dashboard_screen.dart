@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/admin_repository.dart';
-import '../../../../shared/widgets/croma_app_bar.dart';
 import '../../../../shared/widgets/croma_loading.dart';
 import '../widgets/admin_drawer.dart';
+import '../widgets/admin_app_bar.dart';
 
 class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
@@ -16,17 +16,7 @@ class AdminDashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFDFDFD),
-      appBar: CromaAppBar(
-        title: const Text(
-          'ADMIN PANEL',
-          style: TextStyle(
-            color: Color(0xFF202020),
-            fontSize: 14,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 2,
-          ),
-        ),
-      ),
+      appBar: const AdminAppBar(title: 'DASHBOARD'),
       drawer: const AdminDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -124,12 +114,12 @@ class _AdminTechnicalHeader extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: Colors.emerald.withValues(alpha: 0.1),
-                border: Border.all(color: Colors.emerald.withValues(alpha: 0.2)),
+                color: Color(0xFF10B981).withValues(alpha: 0.1),
+                border: Border.all(color: Color(0xFF10B981).withValues(alpha: 0.2)),
               ),
               child: const Text(
                 'SISTEMA_LISTO',
-                style: TextStyle(color: Colors.emerald, fontSize: 8, fontWeight: FontWeight.black, letterSpacing: 1),
+                style: TextStyle(color: Color(0xFF10B981), fontSize: 8, fontWeight: FontWeight.w900, letterSpacing: 1),
               ),
             ),
             const SizedBox(width: 8),
@@ -137,14 +127,14 @@ class _AdminTechnicalHeader extends StatelessWidget {
             const SizedBox(width: 8),
             const Text(
               'v2.0.48_ADMIN',
-              style: TextStyle(color: Colors.black26, fontSize: 8, fontWeight: FontWeight.black, letterSpacing: 1),
+              style: TextStyle(color: Colors.black26, fontSize: 8, fontWeight: FontWeight.w900, letterSpacing: 1),
             ),
           ],
         ),
         const SizedBox(height: 16),
         RichText(
           text: const TextSpan(
-            style: TextStyle(color: Colors.black, fontSize: 40, fontWeight: FontWeight.black, height: 0.9, letterSpacing: -1),
+            style: TextStyle(color: Colors.black, fontSize: 40, fontWeight: FontWeight.w900, height: 0.9, letterSpacing: -1),
             children: [
               TextSpan(text: 'SISTEMA\n'),
               TextSpan(text: 'PANEL_CENTRAL', style: TextStyle(color: Colors.black12)),
@@ -158,7 +148,7 @@ class _AdminTechnicalHeader extends StatelessWidget {
             const SizedBox(width: 8),
             const Text(
               'PANEL DE CONTROL CENTRAL DE OPERACIONES',
-              style: TextStyle(color: Colors.black26, fontSize: 9, fontWeight: FontWeight.black, letterSpacing: 1),
+              style: TextStyle(color: Colors.black26, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1),
             ),
           ],
         ),
@@ -210,7 +200,7 @@ class _MetricCard extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(color: subColor, fontSize: 9, fontWeight: FontWeight.black, letterSpacing: 1.5),
+                style: TextStyle(color: subColor, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1.5),
               ),
               Icon(icon, color: isAlert ? Colors.orange : subColor, size: 16),
             ],
@@ -218,12 +208,12 @@ class _MetricCard extends StatelessWidget {
           const Spacer(),
           Text(
             value,
-            style: TextStyle(color: textColor, fontSize: 28, fontWeight: FontWeight.black, letterSpacing: -1, height: 1),
+            style: TextStyle(color: textColor, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -1, height: 1),
           ),
           const SizedBox(height: 8),
           Text(
             subtitle,
-            style: TextStyle(color: isAlert ? Colors.orange : subColor, fontSize: 8, fontWeight: FontWeight.black, letterSpacing: 1),
+            style: TextStyle(color: isAlert ? Colors.orange : subColor, fontSize: 8, fontWeight: FontWeight.w900, letterSpacing: 1),
           ),
         ],
       ),
@@ -260,7 +250,7 @@ class _RecentOrderTile extends StatelessWidget {
             child: Center(
               child: Text(
                 '#${order['id'].toString().substring(0, 3).toUpperCase()}',
-                style: const TextStyle(fontWeight: FontWeight.black, fontSize: 10, color: Colors.black26),
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 10, color: Colors.black26),
               ),
             ),
           ),
@@ -271,11 +261,11 @@ class _RecentOrderTile extends StatelessWidget {
               children: [
                 Text(
                   'SEC_ID: ${order['id'].toString().substring(0, 12).toUpperCase()}',
-                  style: const TextStyle(fontWeight: FontWeight.black, fontSize: 13, letterSpacing: -0.5),
+                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: -0.5),
                 ),
                 Text(
                   (profile?['full_name'] ?? 'USUARIO ANÓN').toString().toUpperCase(),
-                  style: const TextStyle(color: Colors.black26, fontSize: 9, fontWeight: FontWeight.black, letterSpacing: 0.5),
+                  style: const TextStyle(color: Colors.black26, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 0.5),
                 ),
               ],
             ),
@@ -291,13 +281,13 @@ class _RecentOrderTile extends StatelessWidget {
                 ),
                 child: Text(
                   order['status'].toString().toUpperCase(),
-                  style: TextStyle(color: statusColor, fontSize: 9, fontWeight: FontWeight.black, letterSpacing: 1),
+                  style: TextStyle(color: statusColor, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1),
                 ),
               ),
               const SizedBox(height: 6),
               Text(
                 '${(order['total_amount'] as num).toStringAsFixed(2)} €',
-                style: const TextStyle(fontWeight: FontWeight.black, fontSize: 14, tabularNums: true),
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
               ),
             ],
           ),
@@ -310,7 +300,7 @@ class _RecentOrderTile extends StatelessWidget {
 
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
-      case 'delivered': return Colors.emerald;
+      case 'delivered': return const Color(0xFF10B981);
       case 'shipped': return Colors.blue;
       case 'pending': return Colors.orange;
       case 'cancelled': return Colors.red;

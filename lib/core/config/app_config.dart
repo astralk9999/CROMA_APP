@@ -7,10 +7,12 @@ class AppConfig {
 
   static String get supabaseUrl => _getEnv('SUPABASE_URL');
   static String get supabaseAnonKey => _getEnv('SUPABASE_ANON_KEY');
+  static String get supabaseServiceRoleKey => _getEnv('SUPABASE_SERVICE_ROLE_KEY');
 
   static String get cloudinaryCloudName => _getEnv('CLOUDINARY_CLOUD_NAME');
 
   static String get stripePublishableKey => _getEnv('STRIPE_PUBLISHABLE_KEY');
+  static String get stripeSecretKey => _getEnv('STRIPE_SECRET_KEY');
 
   static String get apiBaseUrl => _getEnv('API_BASE_URL');
 

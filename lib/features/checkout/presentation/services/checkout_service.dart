@@ -8,6 +8,7 @@ class CheckoutService {
     required List<Map<String, dynamic>> items,
     required Map<String, dynamic> shippingAddress,
     String? selectedAddressId,
+    double discountAmount = 0.0,
   }) async {
     // 1. Process Stripe Payment
     final user = SupabaseService.client.auth.currentUser;
@@ -16,6 +17,7 @@ class CheckoutService {
       shippingAddress: shippingAddress,
       email: shippingAddress['email'] ?? '',
       userId: user?.id,
+      discountAmount: discountAmount,
     );
 
     if (success && user != null) {
@@ -26,7 +28,6 @@ class CheckoutService {
           await repo.saveAddress(ShippingAddress.fromJson(shippingAddress));
         } catch (e) {
           // Silently fail address saving to not block the purchase
-          print('Error saving address: $e');
         }
       }
     }

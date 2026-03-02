@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../data/account_repository.dart';
-import '../../../../shared/widgets/croma_app_bar.dart';
 import '../../../../shared/widgets/croma_loading.dart';
 import '../../../../shared/widgets/cached_image.dart';
 import '../../../../core/providers/language_provider.dart';
+import '../../services/invoice_generator.dart';
 
 class OrderDetailsScreen extends ConsumerWidget {
   final String orderId;
@@ -19,52 +20,57 @@ class OrderDetailsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CromaAppBar(
-        title: Text(
-          isEs ? 'DETALLES DEL PEDIDO' : 'ORDER DETAILS',
-          style: const TextStyle(
-            color: Color(0xFF202020),
-            fontSize: 14,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 2,
-          ),
-        ),
-      ),
+      // AppBar removido para evitar problemas directos
       body: orderAsync.when(
         data: (order) {
           if (order == null) return const Center(child: Text('Pedido no encontrado'));
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ─── STATUS & ID ───
-                _buildOrderHeader(order, isEs),
-                const SizedBox(height: 32),
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // ─── STATUS & ID ───
+                    _buildOrderHeader(order, isEs),
+                    const SizedBox(height: 32),
 
-                // ─── ITEMS ───
-                Text(
-                  isEs ? 'ARTÍCULOS' : 'ITEMS',
-                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 2, color: Colors.black54),
+                    // ─── ITEMS ───
+                    Text(
+                      isEs ? 'ARTÍCULOS' : 'ITEMS',
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 2, color: Colors.black54),
+                    ),
+                    const SizedBox(height: 16),
+                    ...order.items.map((item) => _buildOrderItem(item)),
+                    const SizedBox(height: 32),
+
+                    // ─── SUMMARY ───
+                    _buildOrderSummary(order, isEs),
+                    const SizedBox(height: 32),
+
+                    // ─── SHIPPING ───
+                    _buildShippingInfo(order, isEs),
+                    const SizedBox(height: 48),
+
+                    // ─── ACTIONS ───
+                    _buildActions(context, ref, order, isEs),
+                    const SizedBox(height: 48),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                ...order.items.map((item) => _buildOrderItem(item)),
-                const SizedBox(height: 32),
-
-                // ─── SUMMARY ───
-                _buildOrderSummary(order, isEs),
-                const SizedBox(height: 32),
-
-                // ─── SHIPPING ───
-                _buildShippingInfo(order, isEs),
-                const SizedBox(height: 48),
-
-                // ─── ACTIONS ───
-                _buildActions(context, order, isEs),
-                const SizedBox(height: 48),
-              ],
-            ),
+              ),
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 10,
+                left: 16,
+                child: CircleAvatar(
+                  backgroundColor: Colors.white.withValues(alpha: 0.8),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () => context.pop(),
+                  ),
+                ),
+              ),
+            ],
           );
         },
         loading: () => const Center(child: CromaLoading()),
@@ -203,25 +209,28 @@ class OrderDetailsScreen extends ConsumerWidget {
           style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 2, color: Colors.black54),
         ),
         const SizedBox(height: 16),
-        Text(addr.street, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+        Text(addr.address, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
         Text('${addr.postalCode} ${addr.city}', style: const TextStyle(fontSize: 14, color: Colors.black87)),
         Text(addr.country, style: const TextStyle(fontSize: 14, color: Colors.black54)),
       ],
     );
   }
 
-  Widget _buildActions(BuildContext context, dynamic order, bool isEs) {
+  Widget _buildActions(BuildContext context, WidgetRef ref, dynamic order, bool isEs) {
     return Column(
       children: [
         ElevatedButton.icon(
-          onPressed: () {
-             // TODO: PDF Invoice Generation
-             ScaffoldMessenger.of(context).showSnackBar(
-               SnackBar(content: Text(isEs ? 'Generando factura...' : 'Generating invoice...'))
-             );
+          onPressed: () async {
+            try {
+              await InvoiceGenerator.generateAndShareInvoice(order);
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error generating invoice: $e')));
+              }
+            }
           },
-          icon: const Icon(Icons.file_download_outlined, color: Colors.white),
-          label: Text(isEs ? 'DESCARGAR FACTURA' : 'DOWNLOAD INVOICE'),
+          icon: const Icon(Icons.receipt_long_outlined, color: Colors.white),
+          label: Text(isEs ? 'DESCARGAR RECIBO' : 'DOWNLOAD RECEIPT'),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF202020),
             foregroundColor: Colors.white,
@@ -231,24 +240,55 @@ class OrderDetailsScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
-        if (order.status == 'delivered')
+        if (order.status == 'pending')
           OutlinedButton.icon(
+            onPressed: () async {
+              try {
+                await ref.read(accountRepositoryProvider).updateOrderStatus(order.id, 'cancelled');
+                ref.invalidate(orderDetailsProvider(order.id));
+                ref.invalidate(userOrdersProvider);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(isEs ? 'Pedido cancelado ✅' : 'Order cancelled ✅'))
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: $e'))
+                  );
+                }
+              }
+            },
+            icon: const Icon(Icons.cancel_outlined),
+            label: Text(isEs ? 'CANCELAR PEDIDO' : 'CANCEL ORDER'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.red,
+              side: const BorderSide(color: Colors.red, width: 2),
+              minimumSize: const Size(double.infinity, 56),
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+              textStyle: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
+            ),
+          ),
+        const SizedBox(height: 16),
+        if (order.status == 'delivered') ...[
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
             onPressed: () {
-              // TODO: Navigate to Return Request
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(isEs ? 'Iniciando devolución...' : 'Starting return...'))
-              );
+              context.push('/orders/${order.id}/return');
             },
             icon: const Icon(Icons.assignment_return_outlined),
             label: Text(isEs ? 'SOLICITAR DEVOLUCIÓN' : 'REQUEST RETURN'),
-            style: OutlinedButton.styleFrom(
+            style: ElevatedButton.styleFrom(
               foregroundColor: Colors.black,
+              backgroundColor: Colors.white,
               side: const BorderSide(color: Colors.black, width: 2),
               minimumSize: const Size(double.infinity, 56),
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
               textStyle: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2, fontSize: 12),
             ),
           ),
+        ],
       ],
     );
   }

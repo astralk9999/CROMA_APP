@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 class CromaAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -12,29 +13,30 @@ class CromaAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(56.0); // Thinner app bar
+  Size get preferredSize => const Size.fromHeight(80.0); // Taller for premium feel
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: 56.0,
+      toolbarHeight: 80.0,
       title: title ?? GestureDetector(
         onTap: () => context.go('/'),
-        child: OverflowBox(
-          minHeight: 0,
-          maxHeight: 120, // Allow the logo to be oversized and stay centered
-          child: Image.asset(
-            'assets/images/chromakopia_logo.png',
-            height: 80, // Oversized logo
-            fit: BoxFit.contain,
-            color: Colors.white, // Ensure visibility on dark app bar
-          ),
+        child: Image.asset(
+          'assets/images/chromakopia_logo.png',
+          height: 60, // Much larger logo
+          fit: BoxFit.contain,
         ),
       ),
       actions: actions,
       centerTitle: true,
       elevation: 0,
-      backgroundColor: const Color(0xFF202020),
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black,
+      systemOverlayStyle: SystemUiOverlayStyle.dark,
+      iconTheme: const IconThemeData(color: Colors.black),
+      shape: const Border(
+        bottom: BorderSide(color: Color(0xFFE5E5E5), width: 1.0),
+      ),
     );
   }
 }

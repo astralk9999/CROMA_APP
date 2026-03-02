@@ -31,6 +31,7 @@ mixin _$Order {
   ShippingAddress get shippingAddress => throw _privateConstructorUsedError;
   @JsonKey(name: 'tracking_number')
   String? get trackingNumber => throw _privateConstructorUsedError;
+  @NotesConverter()
   Map<String, dynamic>? get notes => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
@@ -60,7 +61,7 @@ abstract class $OrderCopyWith<$Res> {
     @JsonKey(name: 'total_amount') double totalAmount,
     @JsonKey(name: 'shipping_address') ShippingAddress shippingAddress,
     @JsonKey(name: 'tracking_number') String? trackingNumber,
-    Map<String, dynamic>? notes,
+    @NotesConverter() Map<String, dynamic>? notes,
     @JsonKey(name: 'created_at') DateTime createdAt,
     @JsonKey(name: 'updated_at') DateTime updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false)
@@ -169,7 +170,7 @@ abstract class _$$OrderImplCopyWith<$Res> implements $OrderCopyWith<$Res> {
     @JsonKey(name: 'total_amount') double totalAmount,
     @JsonKey(name: 'shipping_address') ShippingAddress shippingAddress,
     @JsonKey(name: 'tracking_number') String? trackingNumber,
-    Map<String, dynamic>? notes,
+    @NotesConverter() Map<String, dynamic>? notes,
     @JsonKey(name: 'created_at') DateTime createdAt,
     @JsonKey(name: 'updated_at') DateTime updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false)
@@ -262,7 +263,7 @@ class _$OrderImpl implements _Order {
     @JsonKey(name: 'total_amount') required this.totalAmount,
     @JsonKey(name: 'shipping_address') required this.shippingAddress,
     @JsonKey(name: 'tracking_number') this.trackingNumber,
-    final Map<String, dynamic>? notes,
+    @NotesConverter() final Map<String, dynamic>? notes,
     @JsonKey(name: 'created_at') required this.createdAt,
     @JsonKey(name: 'updated_at') required this.updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false)
@@ -291,6 +292,7 @@ class _$OrderImpl implements _Order {
   final String? trackingNumber;
   final Map<String, dynamic>? _notes;
   @override
+  @NotesConverter()
   Map<String, dynamic>? get notes {
     final value = _notes;
     if (value == null) return null;
@@ -382,7 +384,7 @@ abstract class _Order implements Order {
     @JsonKey(name: 'shipping_address')
     required final ShippingAddress shippingAddress,
     @JsonKey(name: 'tracking_number') final String? trackingNumber,
-    final Map<String, dynamic>? notes,
+    @NotesConverter() final Map<String, dynamic>? notes,
     @JsonKey(name: 'created_at') required final DateTime createdAt,
     @JsonKey(name: 'updated_at') required final DateTime updatedAt,
     @JsonKey(includeFromJson: false, includeToJson: false)
@@ -408,6 +410,7 @@ abstract class _Order implements Order {
   @JsonKey(name: 'tracking_number')
   String? get trackingNumber;
   @override
+  @NotesConverter()
   Map<String, dynamic>? get notes;
   @override
   @JsonKey(name: 'created_at')

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/widgets/croma_app_bar.dart';
 import '../../../../shared/widgets/croma_bottom_nav.dart';
 import '../../../../shared/widgets/cached_image.dart';
 import '../../../../shared/widgets/croma_loading.dart';
@@ -16,7 +15,7 @@ class CartScreen extends ConsumerWidget {
 
     return Scaffold(
       extendBody: true,
-      appBar: const CromaAppBar(),
+      // AppBar removido para evitar problemas directos
       body: cartState.when(
         data: (items) {
           if (items.isEmpty) {

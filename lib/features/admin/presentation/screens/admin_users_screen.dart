@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import '../../data/admin_repository.dart';
 import '../../../../shared/widgets/croma_loading.dart';
 import '../widgets/admin_app_bar.dart';
@@ -23,7 +22,7 @@ class AdminUsersScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const AdminAppBar(title: 'GESTIÓN DE USUARIOS'),
+      appBar: const AdminAppBar(title: 'USUARIOS'),
       drawer: const AdminDrawer(),
       body: usersAsync.when(
         data: (users) {
@@ -53,275 +52,79 @@ class AdminUsersScreen extends ConsumerWidget {
             }
           });
 
-          return CustomScrollView(
-            slivers: [
-              _buildIndustrialActionBar(
-                context,
-                ref,
-                filtered.length,
-                users.length,
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
+          if (filtered.isEmpty) {
+            return const Center(child: Text('No se encontraron usuarios'));
+          }
+
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onChanged: (val) =>
+                            ref.read(userSearchQueryProvider.notifier).state =
+                                val,
+                        decoration: const InputDecoration(
+                          hintText: 'BUSCAR POR NOMBRE O EMAIL...',
+                          hintStyle: TextStyle(fontSize: 12, letterSpacing: 1),
+                          prefixIcon: Icon(Icons.search, size: 20),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    AdminSortDropdown(
+                      value: sortOption,
+                      onChanged: (val) =>
+                          ref.read(userSortProvider.notifier).state = val,
+                    ),
+                  ],
                 ),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
+              ),
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: filtered.length,
+                  separatorBuilder: (context, index) =>
+                      const Divider(height: 1),
+                  itemBuilder: (context, index) {
                     final user = filtered[index];
-                    return _UserAdminCard(user: user);
-                  }, childCount: filtered.length),
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                      title: Text(
+                        (user['full_name'] as String? ?? 'SIN NOMBRE')
+                            .toUpperCase(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      subtitle: Text(
+                        user['email'] as String? ?? 'SIN EMAIL',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      trailing: Text(
+                        (user['created_at'] as String? ?? '').substring(0, 10),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.black38,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
           );
         },
-        loading: () => const Center(child: CromaLoading()),
-        error: (e, __) => Center(child: Text('Error: $e')),
-      ),
-    );
-  }
-
-  Widget _buildIndustrialActionBar(
-    BuildContext context,
-    WidgetRef ref,
-    int visibleCount,
-    int totalCount,
-  ) {
-    return SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 24.0, top: 16.0),
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF18181b),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.5),
-                    blurRadius: 50,
-                    offset: const Offset(0, 20),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.05),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.1),
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.search,
-                            color: Colors.white54,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: TextField(
-                              onChanged: (val) =>
-                                  ref
-                                          .read(
-                                            userSearchQueryProvider.notifier,
-                                          )
-                                          .state =
-                                      val,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 2.0,
-                              ),
-                              decoration: const InputDecoration(
-                                hintText: 'IDENTIFICAR USUARIO...',
-                                hintStyle: TextStyle(
-                                  color: Colors.white24,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 2.0,
-                                ),
-                                border: InputBorder.none,
-                                filled: false,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  AdminSortDropdown(
-                    value: ref.watch(userSortProvider),
-                    onChanged: (val) =>
-                        ref.read(userSortProvider.notifier).state = val,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 1,
-                    color: Colors.black.withValues(alpha: 0.03),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                      color: Colors.black.withValues(alpha: 0.05),
-                    ),
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: const [
-                      BoxShadow(color: Colors.black12, blurRadius: 4),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF3f3f46),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        ref.watch(userSearchQueryProvider).isEmpty
-                            ? '$totalCount PERFILES REGISTRADOS'
-                            : '$visibleCount DE $totalCount RESULTADOS',
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.grey,
-                          letterSpacing: 2.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    height: 1,
-                    color: Colors.black.withValues(alpha: 0.03),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _UserAdminCard extends StatelessWidget {
-  final Map<String, dynamic> user;
-
-  const _UserAdminCard({required this.user});
-
-  @override
-  Widget build(BuildContext context) {
-    final createdAt = DateTime.tryParse(user['created_at']?.toString() ?? '');
-    final dateStr = createdAt != null
-        ? DateFormat('dd/MM/yyyy').format(createdAt)
-        : 'N/A';
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: const BoxDecoration(
-              color: Color(0xFFF9F9F9),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.person_outline, color: Colors.black26),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  (user['full_name'] ?? 'USUARIO SIN NOMBRE')
-                      .toString()
-                      .toUpperCase(),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 13,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                Text(
-                  (user['email'] ?? '').toString(),
-                  style: const TextStyle(
-                    color: Colors.black26,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              const Text(
-                'REGISTRADO',
-                style: TextStyle(
-                  color: Colors.black26,
-                  fontSize: 8,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1,
-                ),
-              ),
-              Text(
-                dateStr,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 11,
-                ),
-              ),
-            ],
-          ),
-        ],
+        loading: () => const CromaLoading(),
+        error: (err, stack) => Center(child: Text('Error: $err')),
       ),
     );
   }

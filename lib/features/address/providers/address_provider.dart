@@ -1,5 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:fashion_store/features/address/data/address_repository.dart';
+import 'package:croma/features/address/data/address_repository.dart';
 import '../../../../shared/models/shipping_address.dart';
 
 part 'address_provider.g.dart';

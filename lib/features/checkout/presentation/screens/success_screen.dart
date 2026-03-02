@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fashion_store/features/cart/providers/cart_provider.dart';
+import 'package:croma/features/cart/providers/cart_provider.dart';
 
 class SuccessScreen extends ConsumerStatefulWidget {
   const SuccessScreen({super.key});

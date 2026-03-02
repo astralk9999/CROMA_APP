@@ -1,11 +1,11 @@
 {
-    "name": "fashion_store",
-    "short_name": "fashion_store",
+    "name": "CROMA",
+    "short_name": "CROMA",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#000000",
-    "description": "A new Flutter project.",
+    "description": "CROMA - Premium Streetwear Mobile App",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

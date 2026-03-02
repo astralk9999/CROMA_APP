@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:fashion_store/core/config/app_config.dart';
-import 'package:fashion_store/core/services/supabase_service.dart';
+import 'package:croma/core/config/app_config.dart';
+import 'package:croma/core/services/supabase_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -23,10 +23,14 @@ class StripeService {
   }) async {
     try {
       final supabase = SupabaseService.adminClient;
-      
+
       // 1. Obtener ID de usuario (usar ID de invitado si es nulo)
-      final actualUserId = userId ?? SupabaseService.client.auth.currentUser?.id ?? AppConfig.guestUserId;
-      final actualEmail = email ?? shippingAddress['email'] ?? 'guest@croma.shop';
+      final actualUserId =
+          userId ??
+          SupabaseService.client.auth.currentUser?.id ??
+          AppConfig.guestUserId;
+      final actualEmail =
+          email ?? shippingAddress['email'] ?? 'guest@croma.shop';
 
       // 1.5 Asegurar que el perfil existe (para evitar error de clave foránea)
       await supabase.from('profiles').upsert({
@@ -36,45 +40,62 @@ class StripeService {
       }, onConflict: 'id');
 
       // 2. Calcular total
-      final double totalItemsAmount = items.fold(0, (sum, item) => sum + (double.parse(item['price'].toString()) * item['quantity']));
+      final double totalItemsAmount = items.fold(
+        0,
+        (sum, item) =>
+            sum + (double.parse(item['price'].toString()) * item['quantity']),
+      );
       double totalAmount = totalItemsAmount - discountAmount;
       if (totalAmount <= 0) totalAmount = 0.50; // Stripe minimum is 50 cents
       final int amountInCents = (totalAmount * 100).round();
 
       // 3. Crear pedido en Supabase
-      final orderResponse = await supabase.from('orders').insert({
-        'user_id': actualUserId,
-        'status': 'pending',
-        'total_amount': totalAmount,
-        'shipping_address': shippingAddress,
-      }).select().single();
+      final orderResponse = await supabase
+          .from('orders')
+          .insert({
+            'user_id': actualUserId,
+            'status': 'pending',
+            'total_amount': totalAmount,
+            'shipping_address': shippingAddress,
+          })
+          .select()
+          .single();
 
       final String orderId = orderResponse['id'].toString();
 
       // 4. Crear items del pedido
-      final List<Map<String, dynamic>> orderItems = items.map((item) => {
-        'order_id': orderId,
-        'product_id': item['id'],
-        'product_name': item['name'],
-        'product_image': item['image'],
-        'size': item['size'],
-        'quantity': item['quantity'],
-        'price': item['price'],
-      }).toList();
+      final List<Map<String, dynamic>> orderItems = items
+          .map(
+            (item) => {
+              'order_id': orderId,
+              'product_id': item['id'],
+              'product_name': item['name'],
+              'product_image': item['image'],
+              'size': item['size'],
+              'quantity': item['quantity'],
+              'price': item['price'],
+            },
+          )
+          .toList();
 
       await supabase.from('order_items').insert(orderItems);
 
       // 5. Reservar stock (RPC)
       for (final item in items) {
-        final stockResult = await supabase.rpc('decrement_stock', params: {
-          'p_product_id': item['id'],
-          'p_size': item['size'],
-          'p_quantity': item['quantity']
-        });
-        
+        final stockResult = await supabase.rpc(
+          'decrement_stock',
+          params: {
+            'p_product_id': item['id'],
+            'p_size': item['size'],
+            'p_quantity': item['quantity'],
+          },
+        );
+
         // El RPC devuelve un mapa con 'success'
         if (stockResult is Map && stockResult['success'] == false) {
-          throw Exception('Sin stock suficiente para ${item['name']} (${item['size']})');
+          throw Exception(
+            'Sin stock suficiente para ${item['name']} (${item['size']})',
+          );
         }
       }
 
@@ -91,9 +112,7 @@ class StripeService {
         },
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
-          headers: {
-            'Authorization': 'Bearer ${AppConfig.stripeSecretKey}',
-          },
+          headers: {'Authorization': 'Bearer ${AppConfig.stripeSecretKey}'},
         ),
       );
 
@@ -103,9 +122,12 @@ class StripeService {
       }
 
       // 7. Vincular PaymentIntent al pedido
-      await supabase.from('orders').update({
-        'notes': jsonEncode({'stripe_payment_intent': response.data['id']})
-      }).eq('id', orderId);
+      await supabase
+          .from('orders')
+          .update({
+            'notes': jsonEncode({'stripe_payment_intent': response.data['id']}),
+          })
+          .eq('id', orderId);
 
       // 8. Inicializar y mostrar Pasarela (WEB vs MÓVIL)
       if (kIsWeb) {
@@ -127,7 +149,8 @@ class StripeService {
           if (remainingDiscount > 0) {
             if (remainingDiscount >= itemTotal) {
               remainingDiscount -= itemTotal;
-              itemTotal = 0; // This will cause Stripe error if 0 unit_amount, so let's adjust to 0.50 min or similar later if necessary. 
+              itemTotal =
+                  0; // This will cause Stripe error if 0 unit_amount, so let's adjust to 0.50 min or similar later if necessary.
               // To avoid Stripe unit_amount = 0 error, we just give it 0 amount and see if Stripe supports 0 amounts in some cases, but actually we pass the discounted price per unit.
             } else {
               itemTotal -= remainingDiscount;
@@ -137,14 +160,16 @@ class StripeService {
 
           // Stripe API only accepts integer amounts in cents per unit, and unit price must be > 0 ideally
           int unitPriceCents = (itemTotal / qty * 100).round();
-          if (unitPriceCents <= 0) unitPriceCents = 0; 
-          
+          if (unitPriceCents <= 0) unitPriceCents = 0;
+
           sessionData['line_items[$i][price_data][currency]'] = 'eur';
-          sessionData['line_items[$i][price_data][product_data][name]'] = item['name'];
-          sessionData['line_items[$i][price_data][unit_amount]'] = unitPriceCents;
+          sessionData['line_items[$i][price_data][product_data][name]'] =
+              item['name'];
+          sessionData['line_items[$i][price_data][unit_amount]'] =
+              unitPriceCents;
           sessionData['line_items[$i][quantity]'] = qty;
         }
-        
+
         sessionData['metadata[order_id]'] = orderId;
 
         final sessionResponse = await dio.post(
@@ -152,9 +177,7 @@ class StripeService {
           data: sessionData,
           options: Options(
             contentType: Headers.formUrlEncodedContentType,
-            headers: {
-              'Authorization': 'Bearer ${AppConfig.stripeSecretKey}',
-            },
+            headers: {'Authorization': 'Bearer ${AppConfig.stripeSecretKey}'},
           ),
         );
 
@@ -162,7 +185,7 @@ class StripeService {
         if (sessionUrl != null) {
           if (await canLaunchUrlString(sessionUrl)) {
             await launchUrlString(sessionUrl, webOnlyWindowName: '_self');
-            return true; 
+            return true;
           }
         }
         throw Exception('No se pudo generar la sesión de Stripe Checkout');
